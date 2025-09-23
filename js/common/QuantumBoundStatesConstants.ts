@@ -8,13 +8,14 @@
 
 import quantumBoundStates from '../quantumBoundStates.js';
 
-const QuantumBoundStatesConstants = {
+export default class QuantumBoundStatesConstants {
 
-  SCREEN_VIEW_X_MARGIN: 15,
-  SCREEN_VIEW_Y_MARGIN: 15
+  private constructor() {
+    // Not intended for instantiation.
+  }
 
-  //TODO
-};
+  public static readonly SCREEN_VIEW_X_MARGIN = 15;
+  public static readonly SCREEN_VIEW_Y_MARGIN = 15;
+}
 
 quantumBoundStates.register( 'QuantumBoundStatesConstants', QuantumBoundStatesConstants );
-export default QuantumBoundStatesConstants;

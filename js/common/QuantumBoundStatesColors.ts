@@ -17,14 +17,17 @@
 import ProfileColorProperty from '../../../scenery/js/util/ProfileColorProperty.js';
 import quantumBoundStates from '../quantumBoundStates.js';
 
-const QuantumBoundStatesColors = {
+export default class QuantumBoundStatesColors {
+
+  private constructor() {
+    // Not intended for instantiation.
+  }
 
   // Background color for screens in this sim
-  screenBackgroundColorProperty: new ProfileColorProperty( quantumBoundStates, 'screenBackgroundColor', {
+  public static readonly screenBackgroundColorProperty = new ProfileColorProperty( quantumBoundStates, 'screenBackgroundColor', {
     default: 'white',
     projector: 'black'
-  } )
-};
+  } );
+}
 
 quantumBoundStates.register( 'QuantumBoundStatesColors', QuantumBoundStatesColors );
-export default QuantumBoundStatesColors;
