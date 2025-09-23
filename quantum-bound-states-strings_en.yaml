@@ -1,0 +1,9 @@
+# Strings for PhET's Quantum Bound States simulation
+
+# Simulation Title
+quantum-bound-states.title:    Quantum Bound States
+
+# Screen Names
+screen.oneWell:      One Well
+screen.twoWells:     Two Wells
+screen.manyWells:    Many Wells
