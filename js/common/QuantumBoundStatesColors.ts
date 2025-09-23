@@ -21,7 +21,8 @@ const QuantumBoundStatesColors = {
 
   // Background color for screens in this sim
   screenBackgroundColorProperty: new ProfileColorProperty( quantumBoundStates, 'background', {
-    default: 'white'
+    default: 'white',
+    projector: 'black'
   } )
 };
 

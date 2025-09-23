@@ -14,6 +14,7 @@ import QuantumBoundStatesStrings from './QuantumBoundStatesStrings.js';
 import './common/QuantumBoundStatesQueryParameters.js';
 import TwoWellsScreen from './two-wells/TwoWellsScreen.js';
 import ManyWellsScreen from './many-wells/ManyWellsScreen.js';
+import PreferencesModel from '../../joist/js/preferences/PreferencesModel.js';
 
 // Launch the sim. Beware that scenery Image nodes created outside simLauncher.launch() will have zero bounds
 // until the images are fully loaded. See https://github.com/phetsims/coulombs-law/issues/70#issuecomment-429037461
@@ -28,6 +29,12 @@ simLauncher.launch( () => {
   ];
 
   const options: SimOptions = {
+
+    preferencesModel: new PreferencesModel( {
+      visualOptions: {
+        supportsProjectorMode: true
+      }
+    } ),
 
     //TODO fill in credits, all of these fields are optional, see joist.CreditsNode
     credits: {
