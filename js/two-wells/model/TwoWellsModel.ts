@@ -12,14 +12,14 @@ import { PhetioObjectOptions } from '../../../../tandem/js/PhetioObject.js';
 import quantumBoundStates from '../../quantumBoundStates.js';
 
 type SelfOptions = {
-  //TODO add options that are specific to QuantumBoundStatesModel here
+  //TODO add options that are specific to TwoWellsModel here
 };
 
-type QuantumBoundStatesModelOptions = SelfOptions & PickRequired<PhetioObjectOptions, 'tandem'>;
+type TwoWellsModelOptions = SelfOptions & PickRequired<PhetioObjectOptions, 'tandem'>;
 
-export default class QuantumBoundStatesModel implements TModel {
+export default class TwoWellsModel implements TModel {
 
-  public constructor( providedOptions: QuantumBoundStatesModelOptions ) {
+  public constructor( providedOptions: TwoWellsModelOptions ) {
     //TODO
   }
 
@@ -39,4 +39,4 @@ export default class QuantumBoundStatesModel implements TModel {
   }
 }
 
-quantumBoundStates.register( 'QuantumBoundStatesModel', QuantumBoundStatesModel );
+quantumBoundStates.register( 'TwoWellsModel', TwoWellsModel );

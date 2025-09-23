@@ -16,7 +16,9 @@ type StringsType = {
     'titleStringProperty': LocalizedStringProperty;
   };
   'screen': {
-    'nameStringProperty': LocalizedStringProperty;
+    'oneWellStringProperty': LocalizedStringProperty;
+    'twoWellsStringProperty': LocalizedStringProperty;
+    'manyWellsStringProperty': LocalizedStringProperty;
   }
 };
 

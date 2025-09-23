@@ -9,21 +9,21 @@
 import ScreenView, { ScreenViewOptions } from '../../../../joist/js/ScreenView.js';
 import optionize from '../../../../phet-core/js/optionize.js';
 import ResetAllButton from '../../../../scenery-phet/js/buttons/ResetAllButton.js';
-import QuantumBoundStatesConstants from '../../common/QuantumBoundStatesConstants.js';
 import quantumBoundStates from '../../quantumBoundStates.js';
-import QuantumBoundStatesModel from '../model/QuantumBoundStatesModel.js';
+import TwoWellsModel from '../model/TwoWellsModel.js';
+import QuantumBoundStatesConstants from '../../common/QuantumBoundStatesConstants.js';
 
 type SelfOptions = {
- //TODO add options that are specific to QuantumBoundStatesScreenView here
+ //TODO add options that are specific to TwoWellsScreenView here
 };
 
-type QuantumBoundStatesScreenViewOptions = SelfOptions & ScreenViewOptions;
+type TwoWellsScreenViewOptions = SelfOptions & ScreenViewOptions;
 
-export default class QuantumBoundStatesScreenView extends ScreenView {
+export default class TwoWellsScreenView extends ScreenView {
 
-  public constructor( model: QuantumBoundStatesModel, providedOptions: QuantumBoundStatesScreenViewOptions ) {
+  public constructor( model: TwoWellsModel, providedOptions: TwoWellsScreenViewOptions ) {
 
-    const options = optionize<QuantumBoundStatesScreenViewOptions, SelfOptions, ScreenViewOptions>()( {
+    const options = optionize<TwoWellsScreenViewOptions, SelfOptions, ScreenViewOptions>()( {
 
       //TODO add default values for optional SelfOptions here
 
@@ -61,4 +61,4 @@ export default class QuantumBoundStatesScreenView extends ScreenView {
   }
 }
 
-quantumBoundStates.register( 'QuantumBoundStatesScreenView', QuantumBoundStatesScreenView );
+quantumBoundStates.register( 'TwoWellsScreenView', TwoWellsScreenView );

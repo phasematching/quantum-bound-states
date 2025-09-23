@@ -20,6 +20,11 @@
     "supportsOutputJS": true,
     "simFeatures": {
       "supportsDynamicLocale": true
-    }
+    },
+    "screenNameKeys": [
+      "QUANTUM_BOUND_STATES/screen.oneWell",
+      "QUANTUM_BOUND_STATES/screen.twoWells",
+      "QUANTUM_BOUND_STATES/screen.manyWells"
+    ]
   }
 }

@@ -9,9 +9,11 @@
 import Sim, { SimOptions } from '../../joist/js/Sim.js';
 import simLauncher from '../../joist/js/simLauncher.js';
 import Tandem from '../../tandem/js/Tandem.js';
-import QuantumBoundStatesScreen from './quantum-bound-states/QuantumBoundStatesScreen.js';
+import OneWellScreen from './one-well/OneWellScreen.js';
 import QuantumBoundStatesStrings from './QuantumBoundStatesStrings.js';
 import './common/QuantumBoundStatesQueryParameters.js';
+import TwoWellsScreen from './two-wells/TwoWellsScreen.js';
+import ManyWellsScreen from './many-wells/ManyWellsScreen.js';
 
 // Launch the sim. Beware that scenery Image nodes created outside simLauncher.launch() will have zero bounds
 // until the images are fully loaded. See https://github.com/phetsims/coulombs-law/issues/70#issuecomment-429037461
@@ -20,7 +22,9 @@ simLauncher.launch( () => {
   const titleStringProperty = QuantumBoundStatesStrings[ 'quantum-bound-states' ].titleStringProperty;
 
   const screens = [
-    new QuantumBoundStatesScreen( { tandem: Tandem.ROOT.createTandem( 'quantumBoundStatesScreen' ) } )
+    new OneWellScreen( { tandem: Tandem.ROOT.createTandem( 'oneWellScreen' ) } ),
+    new TwoWellsScreen( { tandem: Tandem.ROOT.createTandem( 'twoWellsScreen' ) } ),
+    new ManyWellsScreen( { tandem: Tandem.ROOT.createTandem( 'manyWellsScreen' ) } )
   ];
 
   const options: SimOptions = {
