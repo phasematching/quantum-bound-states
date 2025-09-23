@@ -20,7 +20,7 @@ import quantumBoundStates from '../quantumBoundStates.js';
 const QuantumBoundStatesColors = {
 
   // Background color for screens in this sim
-  screenBackgroundColorProperty: new ProfileColorProperty( quantumBoundStates, 'background', {
+  screenBackgroundColorProperty: new ProfileColorProperty( quantumBoundStates, 'screenBackgroundColor', {
     default: 'white',
     projector: 'black'
   } )
