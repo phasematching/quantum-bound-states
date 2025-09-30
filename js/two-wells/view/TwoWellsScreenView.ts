@@ -6,41 +6,29 @@
  * @author Chris Malley (PixelZoom, Inc.)
  */
 
-import ScreenView, { ScreenViewOptions } from '../../../../joist/js/ScreenView.js';
-import optionize from '../../../../phet-core/js/optionize.js';
+import ScreenView from '../../../../joist/js/ScreenView.js';
 import ResetAllButton from '../../../../scenery-phet/js/buttons/ResetAllButton.js';
 import quantumBoundStates from '../../quantumBoundStates.js';
 import TwoWellsModel from '../model/TwoWellsModel.js';
 import QuantumBoundStatesConstants from '../../common/QuantumBoundStatesConstants.js';
-
-type SelfOptions = {
- //TODO add options that are specific to TwoWellsScreenView here
-};
-
-type TwoWellsScreenViewOptions = SelfOptions & ScreenViewOptions;
+import Tandem from '../../../../tandem/js/Tandem.js';
 
 export default class TwoWellsScreenView extends ScreenView {
 
-  public constructor( model: TwoWellsModel, providedOptions: TwoWellsScreenViewOptions ) {
+  public constructor( model: TwoWellsModel, tandem: Tandem ) {
 
-    const options = optionize<TwoWellsScreenViewOptions, SelfOptions, ScreenViewOptions>()( {
-
-      //TODO add default values for optional SelfOptions here
-
-      //TODO add default values for optional ScreenViewOptions here
-    }, providedOptions );
-
-    super( options );
+    super( {
+      tandem: tandem
+    } );
 
     const resetAllButton = new ResetAllButton( {
       listener: () => {
-        this.interruptSubtreeInput(); // cancel interactions that may be in progress
         model.reset();
         this.reset();
       },
       right: this.layoutBounds.maxX - QuantumBoundStatesConstants.SCREEN_VIEW_X_MARGIN,
       bottom: this.layoutBounds.maxY - QuantumBoundStatesConstants.SCREEN_VIEW_Y_MARGIN,
-      tandem: options.tandem.createTandem( 'resetAllButton' )
+      tandem: tandem.createTandem( 'resetAllButton' )
     } );
     this.addChild( resetAllButton );
   }

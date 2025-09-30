@@ -7,19 +7,12 @@
  */
 
 import TModel from '../../../../joist/js/TModel.js';
-import PickRequired from '../../../../phet-core/js/types/PickRequired.js';
-import { PhetioObjectOptions } from '../../../../tandem/js/PhetioObject.js';
 import quantumBoundStates from '../../quantumBoundStates.js';
-
-type SelfOptions = {
-  //TODO add options that are specific to ManyWellsModel here
-};
-
-type ManyWellsModelOptions = SelfOptions & PickRequired<PhetioObjectOptions, 'tandem'>;
+import Tandem from '../../../../tandem/js/Tandem.js';
 
 export default class ManyWellsModel implements TModel {
 
-  public constructor( providedOptions: ManyWellsModelOptions ) {
+  public constructor( tandem: Tandem ) {
     //TODO
   }
 

@@ -22,9 +22,9 @@ simLauncher.launch( () => {
   const titleStringProperty = QuantumBoundStatesStrings[ 'quantum-bound-states' ].titleStringProperty;
 
   const screens = [
-    new OneWellScreen( { tandem: Tandem.ROOT.createTandem( 'oneWellScreen' ) } ),
-    new TwoWellsScreen( { tandem: Tandem.ROOT.createTandem( 'twoWellsScreen' ) } ),
-    new ManyWellsScreen( { tandem: Tandem.ROOT.createTandem( 'manyWellsScreen' ) } )
+    new OneWellScreen( Tandem.ROOT.createTandem( 'oneWellScreen' ) ),
+    new TwoWellsScreen( Tandem.ROOT.createTandem( 'twoWellsScreen' ) ),
+    new ManyWellsScreen( Tandem.ROOT.createTandem( 'manyWellsScreen' ) )
   ];
 
   const options: SimOptions = {

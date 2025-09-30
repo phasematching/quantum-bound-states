@@ -7,35 +7,26 @@
  */
 
 import Screen, { ScreenOptions } from '../../../joist/js/Screen.js';
-import optionize from '../../../phet-core/js/optionize.js';
 import quantumBoundStates from '../quantumBoundStates.js';
 import QuantumBoundStatesStrings from '../QuantumBoundStatesStrings.js';
 import QuantumBoundStatesColors from '../common/QuantumBoundStatesColors.js';
 import ManyWellsModel from './model/ManyWellsModel.js';
 import ManyWellsScreenView from './view/ManyWellsScreenView.js';
-
-type SelfOptions = {
-  //TODO add options that are specific to ManyWellsScreen here
-};
-
-type ManyWellsScreenOptions = SelfOptions & ScreenOptions;
+import Tandem from '../../../tandem/js/Tandem.js';
 
 export default class ManyWellsScreen extends Screen<ManyWellsModel, ManyWellsScreenView> {
 
-  public constructor( providedOptions: ManyWellsScreenOptions ) {
+  public constructor( tandem: Tandem ) {
 
-    const options = optionize<ManyWellsScreenOptions, SelfOptions, ScreenOptions>()( {
+    const options: ScreenOptions = {
       name: QuantumBoundStatesStrings.screen.manyWellsStringProperty,
-
-      //TODO add default values for optional SelfOptions here
-
-      //TODO add default values for optional ScreenOptions here
-      backgroundColorProperty: QuantumBoundStatesColors.screenBackgroundColorProperty
-    }, providedOptions );
+      backgroundColorProperty: QuantumBoundStatesColors.screenBackgroundColorProperty,
+      tandem: tandem
+    };
 
     super(
-      () => new ManyWellsModel( { tandem: options.tandem.createTandem( 'model' ) } ),
-      model => new ManyWellsScreenView( model, { tandem: options.tandem.createTandem( 'view' ) } ),
+      () => new ManyWellsModel( tandem.createTandem( 'model' ) ),
+      model => new ManyWellsScreenView( model, tandem.createTandem( 'view' ) ),
       options
     );
   }
