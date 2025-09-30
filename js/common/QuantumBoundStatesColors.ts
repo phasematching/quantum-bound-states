@@ -1,7 +1,7 @@
 // Copyright 2025, University of Colorado Boulder
 
 /**
- * Defines the colors for this sim.
+ * QuantumBoundStatesColors defines colors that are used throughout this simulation.
  *
  * All simulations should have a Colors.js file, see https://github.com/phetsims/scenery-phet/issues/642.
  *
