@@ -1,7 +1,7 @@
 // Copyright 2025, University of Colorado Boulder
 
 /**
- * TODO Describe this class and its responsibilities.
+ * TwoWellsScreen is the 'Two Wells' screen.
  *
  * @author Chris Malley (PixelZoom, Inc.)
  */

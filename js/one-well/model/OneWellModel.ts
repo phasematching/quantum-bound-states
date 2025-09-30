@@ -1,7 +1,7 @@
 // Copyright 2025, University of Colorado Boulder
 
 /**
- * TODO Describe this class and its responsibilities.
+ * OneWellModel is the top-level model for the 'One Well' screen.
  *
  * @author Chris Malley (PixelZoom, Inc.)
  */

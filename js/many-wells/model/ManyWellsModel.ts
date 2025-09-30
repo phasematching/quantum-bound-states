@@ -1,7 +1,7 @@
 // Copyright 2025, University of Colorado Boulder
 
 /**
- * TODO Describe this class and its responsibilities.
+ * ManyWellsModel is the top-level model for the 'Many Wells' screen.
  *
  * @author Chris Malley (PixelZoom, Inc.)
  */
