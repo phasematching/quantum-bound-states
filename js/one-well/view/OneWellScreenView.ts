@@ -12,6 +12,7 @@ import quantumBoundStates from '../../quantumBoundStates.js';
 import OneWellModel from '../model/OneWellModel.js';
 import QuantumBoundStatesConstants from '../../common/QuantumBoundStatesConstants.js';
 import Tandem from '../../../../tandem/js/Tandem.js';
+import Node from '../../../../scenery/js/nodes/Node.js';
 
 export default class OneWellScreenView extends ScreenView {
 
@@ -30,7 +31,26 @@ export default class OneWellScreenView extends ScreenView {
       bottom: this.layoutBounds.maxY - QuantumBoundStatesConstants.SCREEN_VIEW_Y_MARGIN,
       tandem: tandem.createTandem( 'resetAllButton' )
     } );
-    this.addChild( resetAllButton );
+
+    // Rendering order, from back to front
+    const screenViewRootNode = new Node( {
+      children: [
+        //TODO
+        resetAllButton
+      ]
+    } );
+    this.addChild( screenViewRootNode );
+
+    // Play Area focus order
+    this.pdomPlayAreaNode.pdomOrder = [
+      //TODO
+    ];
+
+    // Control Area focus order
+    this.pdomControlAreaNode.pdomOrder = [
+      //TODO
+      resetAllButton
+    ];
   }
 
   /**
