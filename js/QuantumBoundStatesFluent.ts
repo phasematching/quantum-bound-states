@@ -7,6 +7,7 @@
 
 import FluentContainer from '../../chipper/js/browser/FluentContainer.js';
 import FluentComment from '../../chipper/js/browser/FluentComment.js';
+import FluentLibrary from '../../chipper/js/browser-and-node/FluentLibrary.js';
 import quantumBoundStates from './quantumBoundStates.js';
 import QuantumBoundStatesStrings from './QuantumBoundStatesStrings.js';
 
@@ -32,7 +33,7 @@ addToMapIfDefined( 'screen_manyWells', 'screen.manyWellsStringProperty' );
 const createFluentFile = (): string => {
   let ftl = '';
   for (const [key, stringProperty] of fluentKeyToStringPropertyMap.entries()) {
-    ftl += `${key} = ${stringProperty.value.replace('\n','\n ')}\n`;
+    ftl += `${key} = ${FluentLibrary.formatMultilineForFtl( stringProperty.value )}\n`;
   }
   return ftl;
 };
