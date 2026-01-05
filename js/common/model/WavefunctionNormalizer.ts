@@ -208,7 +208,7 @@ export default class WavefunctionNormalizer {
    *
    * @param psi - Wavefunction array
    * @param dx - Grid spacing
-   * @param tolerance - Tolerance for checking (default: 1e-6)
+   * @param tolerance - Tolerance for checking (default: 1e-6) compared to 1
    * @returns True if |∫|ψ|² dx - 1| < tolerance
    */
   public isNormalized( psi: number[], dx: number, tolerance = 1e-6 ): boolean {

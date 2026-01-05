@@ -25,7 +25,7 @@
  * @example
  * // Object-oriented API (more control)
  * import { NumerovSolverClass } from './NumerovSolver.js';
- * const solver = new NumerovSolverClass( mass, { energyTolerance: 1e-12 } );
+ * const solver = new NumerovSolverClass( mass, { energyTolerance: 1e-20 } );
  * const result = solver.solve( potential, 3, gridConfig, eMin, eMax );
  *
  * @example
