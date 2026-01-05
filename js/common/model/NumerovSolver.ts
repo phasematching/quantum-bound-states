@@ -37,19 +37,18 @@
  * @author Martin Veillette
  */
 
-import quantumBoundStates from '../../quantumBoundStates.js';
 import NumerovSolverClass from './NumerovSolverClass.js';
 import { BoundStateResult, GridConfig, PotentialFunction } from './PotentialFunction.js';
+import NumerovIntegrator from './NumerovIntegrator.js';
+import SymmetricNumerovIntegrator from './SymmetricNumerovIntegrator.js';
+import EnergyRefiner from './EnergyRefiner.js';
+import WavefunctionNormalizer from './WavefunctionNormalizer.js';
 
-// Re-export the main solver class
-export { default as NumerovSolverClass } from './NumerovSolverClass.js';
+// Export classes (OO API and components)
+export { NumerovSolverClass, NumerovIntegrator, SymmetricNumerovIntegrator, EnergyRefiner, WavefunctionNormalizer };
 
-// Re-export component classes
-export { default as NumerovIntegrator } from './NumerovIntegrator.js';
-export { default as SymmetricNumerovIntegrator } from './SymmetricNumerovIntegrator.js';
+// Export types
 export type { Parity } from './SymmetricNumerovIntegrator.js';
-export { default as EnergyRefiner } from './EnergyRefiner.js';
-export { default as WavefunctionNormalizer } from './WavefunctionNormalizer.js';
 export type { NormalizationMethod } from './WavefunctionNormalizer.js';
 
 /**
@@ -75,8 +74,3 @@ export function solveNumerov(
   const solver = new NumerovSolverClass( mass );
   return solver.solve( potential, numStates, gridConfig, energyMin, energyMax );
 }
-
-quantumBoundStates.register( 'NumerovSolver', {
-  solveNumerov: solveNumerov,
-  NumerovSolverClass: NumerovSolverClass
-} );

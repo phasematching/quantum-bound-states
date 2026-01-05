@@ -63,16 +63,6 @@ export default class XGrid {
   }
 
   /**
-   * Get the x value at a specific index.
-   * @param index - Grid point index (0 to numPoints-1)
-   * @returns x value at that index
-   */
-  public getValueAt( index: number ): number {
-    assert && assert( index >= 0 && index < this.numPoints, 'Index out of bounds' );
-    return this.xMin + index * this.getDx();
-  }
-
-  /**
    * Find the index of the grid point closest to x=0.
    * Useful for symmetric potentials centered at the origin.
    * @returns Index of center point
@@ -84,45 +74,6 @@ export default class XGrid {
 
     // Clamp to valid range
     return Math.max( 0, Math.min( this.numPoints - 1, index ) );
-  }
-
-  /**
-   * Check if the grid is symmetric around x=0.
-   * @param tolerance - Relative tolerance for symmetry check (default: 1e-10)
-   * @returns True if |xMin + xMax| < tolerance * max(|xMin|, |xMax|)
-   */
-  public isSymmetric( tolerance = 1e-10 ): boolean {
-    const maxAbs = Math.max( Math.abs( this.xMin ), Math.abs( this.xMax ) );
-    return Math.abs( this.xMin + this.xMax ) < tolerance * maxAbs;
-  }
-
-  /**
-   * Get the grid range (xMax - xMin).
-   */
-  public getRange(): number {
-    return this.xMax - this.xMin;
-  }
-
-  /**
-   * Create a copy of this grid with different parameters.
-   * @param options - Partial parameters to override
-   * @returns New XGrid instance
-   */
-  public withOptions( options: Partial<{ xMin: number; xMax: number; numPoints: number }> ): XGrid {
-    return new XGrid(
-      options.xMin ?? this.xMin,
-      options.xMax ?? this.xMax,
-      options.numPoints ?? this.numPoints
-    );
-  }
-
-  /**
-   * Check if two grids are equivalent.
-   */
-  public equals( other: XGrid, tolerance = 1e-15 ): boolean {
-    return Math.abs( this.xMin - other.xMin ) < tolerance &&
-           Math.abs( this.xMax - other.xMax ) < tolerance &&
-           this.numPoints === other.numPoints;
   }
 
   /**

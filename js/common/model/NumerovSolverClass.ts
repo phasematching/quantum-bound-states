@@ -359,20 +359,6 @@ export default class NumerovSolverClass {
   }
 
   /**
-   * Generate spatial grid points.
-   */
-  private generateGrid( xMin: number, xMax: number, numPoints: number ): number[] {
-    const xGrid: number[] = [];
-    const dx = ( xMax - xMin ) / ( numPoints - 1 );
-
-    for ( let i = 0; i < numPoints; i++ ) {
-      xGrid.push( xMin + i * dx );
-    }
-
-    return xGrid;
-  }
-
-  /**
    * Evaluate potential on grid.
    */
   private evaluatePotential( potential: PotentialFunction, xGrid: number[] ): number[] {
@@ -384,27 +370,6 @@ export default class NumerovSolverClass {
    */
   private getEndValue( psi: number[] ): number {
     return psi[ psi.length - 1 ];
-  }
-
-  /**
-   * Get the integrator instance (for testing or advanced use).
-   */
-  public getIntegrator(): NumerovIntegrator {
-    return this.integrator;
-  }
-
-  /**
-   * Get the energy refiner instance (for testing or advanced use).
-   */
-  public getEnergyRefiner(): EnergyRefiner {
-    return this.energyRefiner;
-  }
-
-  /**
-   * Get the normalizer instance (for testing or advanced use).
-   */
-  public getNormalizer(): WavefunctionNormalizer {
-    return this.normalizer;
   }
 }
 

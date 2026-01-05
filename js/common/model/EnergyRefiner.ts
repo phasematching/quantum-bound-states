@@ -72,28 +72,6 @@ export default class EnergyRefiner {
   }
 
   /**
-   * Refine energy eigenvalue with a custom tolerance.
-   * Useful for when different precision is needed for specific cases.
-   *
-   * @param E1 - Lower energy bound (Joules)
-   * @param E2 - Upper energy bound (Joules)
-   * @param V - Potential energy array (Joules)
-   * @param grid - Spatial grid configuration
-   * @param customTolerance - Custom energy tolerance (Joules)
-   * @returns Refined energy eigenvalue (Joules)
-   */
-  public refineWithTolerance(
-    E1: number,
-    E2: number,
-    V: number[],
-    grid: XGrid,
-    customTolerance: number
-  ): number {
-    const tempRefiner = new EnergyRefiner( this.integrator, customTolerance );
-    return tempRefiner.refine( E1, E2, V, grid );
-  }
-
-  /**
    * Calculate the midpoint between two energies.
    */
   private calculateMidpoint( E1: number, E2: number ): number {
@@ -112,41 +90,6 @@ export default class EnergyRefiner {
    */
   private haveSameSign( value1: number, value2: number ): boolean {
     return Math.sign( value1 ) === Math.sign( value2 );
-  }
-
-  /**
-   * Get the current tolerance.
-   */
-  public getTolerance(): number {
-    return this.tolerance;
-  }
-
-  /**
-   * Estimate the number of iterations needed for given bounds.
-   * Useful for progress tracking or performance estimation.
-   *
-   * @param E1 - Lower energy bound
-   * @param E2 - Upper energy bound
-   * @returns Estimated number of bisection iterations
-   */
-  public estimateIterations( E1: number, E2: number ): number {
-    const range = Math.abs( E2 - E1 );
-    if ( range <= this.tolerance ) {
-      return 0;
-    }
-    // Bisection halves the range each iteration
-    return Math.ceil( Math.log2( range / this.tolerance ) );
-  }
-
-  /**
-   * Check if the given energy bounds are valid for refinement.
-   *
-   * @param E1 - Lower bound
-   * @param E2 - Upper bound
-   * @returns True if bounds are valid
-   */
-  public areValidBounds( E1: number, E2: number ): boolean {
-    return E1 < E2 && isFinite( E1 ) && isFinite( E2 );
   }
 }
 

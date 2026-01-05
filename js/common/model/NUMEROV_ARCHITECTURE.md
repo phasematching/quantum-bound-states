@@ -4,8 +4,6 @@ This document describes the modular architecture of the Numerov solver implement
 
 **Related Documentation:**
 - [README.md](./README.md) - Quick start guide and API overview
-- [TESTING.md](./TESTING.md) - Testing guide and how to run tests
-- [TEST_RESULTS.md](./TEST_RESULTS.md) - Validation results and accuracy metrics
 
 ## Overview
 

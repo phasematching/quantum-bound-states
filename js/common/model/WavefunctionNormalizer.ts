@@ -58,12 +58,7 @@ export default class WavefunctionNormalizer {
   }
 
   /**
-   * Normalize using trapezoidal rule.
-   * Calculates ∫|ψ|² dx ≈ Σ[(ψᵢ² + ψᵢ₊₁²)/2] * dx
-   *
-   * @param psi - Wavefunction array
-   * @param dx - Grid spacing
-   * @returns Normalized wavefunction
+   * Normalize using trapezoidal rule (O(h²) accuracy).
    */
   private normalizeTrapezoidal( psi: number[], dx: number ): number[] {
     const integral = this.calculateTrapezoidalIntegral( psi, dx );
@@ -73,13 +68,7 @@ export default class WavefunctionNormalizer {
   }
 
   /**
-   * Normalize using Simpson's rule.
-   * Calculates ∫|ψ|² dx ≈ (dx/3) * Σ[ψᵢ² + 4ψᵢ₊₁² + ψᵢ₊₂²]
-   * More accurate than trapezoidal rule for smooth functions.
-   *
-   * @param psi - Wavefunction array
-   * @param dx - Grid spacing
-   * @returns Normalized wavefunction
+   * Normalize using Simpson's rule (O(h⁴) accuracy).
    */
   private normalizeSimpson( psi: number[], dx: number ): number[] {
     const integral = this.calculateSimpsonIntegral( psi, dx );
@@ -89,11 +78,7 @@ export default class WavefunctionNormalizer {
   }
 
   /**
-   * Normalize by maximum value.
-   * Sets max|ψ| = 1, useful for visualization.
-   *
-   * @param psi - Wavefunction array
-   * @returns Normalized wavefunction
+   * Normalize by maximum amplitude (useful for visualization).
    */
   private normalizeMax( psi: number[] ): number[] {
     const maxAbs = this.findMaxAbsoluteValue( psi );
@@ -101,12 +86,7 @@ export default class WavefunctionNormalizer {
   }
 
   /**
-   * Calculate integral using trapezoidal rule.
-   * ∫|ψ|² dx ≈ Σ[(ψᵢ² + ψᵢ₊₁²)/2] * dx
-   *
-   * @param psi - Wavefunction array
-   * @param dx - Grid spacing
-   * @returns Integral value
+   * Calculate ∫|ψ|² dx using trapezoidal rule.
    */
   private calculateTrapezoidalIntegral( psi: number[], dx: number ): number {
     let integral = 0;
@@ -120,12 +100,7 @@ export default class WavefunctionNormalizer {
   }
 
   /**
-   * Calculate integral using Simpson's rule.
-   * ∫|ψ|² dx ≈ (dx/3) * Σ[ψᵢ² + 4ψᵢ₊₁² + ψᵢ₊₂²]
-   *
-   * @param psi - Wavefunction array
-   * @param dx - Grid spacing
-   * @returns Integral value
+   * Calculate ∫|ψ|² dx using Simpson's rule.
    */
   private calculateSimpsonIntegral( psi: number[], dx: number ): number {
     let sum = 0;
@@ -151,10 +126,7 @@ export default class WavefunctionNormalizer {
   }
 
   /**
-   * Find maximum absolute value in wavefunction.
-   *
-   * @param psi - Wavefunction array
-   * @returns Maximum absolute value
+   * Find max|ψ|.
    */
   private findMaxAbsoluteValue( psi: number[] ): number {
     let maxAbs = 0;
@@ -167,11 +139,7 @@ export default class WavefunctionNormalizer {
   }
 
   /**
-   * Scale wavefunction by dividing all values by the normalization factor.
-   *
-   * @param psi - Wavefunction array
-   * @param normalization - Normalization factor
-   * @returns Scaled wavefunction
+   * Scale wavefunction: ψ → ψ / normalization.
    */
   private scaleWavefunction( psi: number[], normalization: number ): number[] {
     // Avoid division by zero
