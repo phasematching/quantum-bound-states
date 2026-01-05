@@ -40,7 +40,7 @@ export default class SymmetricNumerovIntegrator {
   /**
    * @param mass - Particle mass in kg
    */
-  public constructor( mass: number) {
+  public constructor( mass: number ) {
     this.mass = mass;
     this.HBAR = FundamentalConstants.HBAR;
   }

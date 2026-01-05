@@ -11,6 +11,7 @@
  */
 
 import quantumBoundStates from '../../quantumBoundStates.js';
+import Utils from '../../../../dot/js/Utils.js';
 
 export default class XGrid {
 
@@ -79,7 +80,7 @@ export default class XGrid {
   public findCenterIndex(): number {
     // For a grid from xMin to xMax, the index closest to x=0 is:
     // index = -xMin / (xMax - xMin) * (numPoints - 1)
-    const index = Math.round( -this.xMin * ( this.numPoints - 1 ) / ( this.xMax - this.xMin ) );
+    const index = Utils.roundSymmetric( -this.xMin * ( this.numPoints - 1 ) / ( this.xMax - this.xMin ) );
 
     // Clamp to valid range
     return Math.max( 0, Math.min( this.numPoints - 1, index ) );
