@@ -15,6 +15,7 @@
 
 import quantumBoundStates from '../../quantumBoundStates.js';
 import FundamentalConstants from './FundamentalConstants.js';
+import XGrid from './XGrid.js';
 
 const HBAR = FundamentalConstants.HBAR;
 
@@ -34,12 +35,14 @@ export default class NumerovIntegrator {
    *
    * @param E - Energy eigenvalue to test (Joules)
    * @param V - Potential energy array (Joules)
-   * @param xGrid - Spatial grid (meters)
-   * @param dx - Grid spacing (meters)
+   * @param grid - Spatial grid configuration
    * @returns Wavefunction array
    */
-  public integrate( E: number, V: number[], xGrid: number[], dx: number ): number[] {
-    const N = xGrid.length;
+  public integrate( E: number, V: number[], grid: XGrid ): number[] {
+    const N = grid.getLength();
+    const dx = grid.getDx();
+
+    // initialization of the wavefunction array
     const psi = new Array( N ).fill( 0 );
 
     // Calculate k²(x) = 2m(E - V(x))/ℏ²

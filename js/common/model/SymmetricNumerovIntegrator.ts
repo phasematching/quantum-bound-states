@@ -21,13 +21,14 @@
  * @example
  * // Find even states of infinite square well
  * const integrator = new SymmetricNumerovIntegrator( mass );
- * const psi = integrator.integrateFromCenter( energy, V, xGrid, dx, 'symmetric' );
+ * const psi = integrator.integrateFromCenter( energy, V, grid, 'symmetric' );
  *
  * @author Martin Veillette
  */
 
 import quantumBoundStates from '../../quantumBoundStates.js';
 import FundamentalConstants from './FundamentalConstants.js';
+import XGrid from './XGrid.js';
 
 export type Parity = 'symmetric' | 'antisymmetric';
 
@@ -50,23 +51,22 @@ export default class SymmetricNumerovIntegrator {
    *
    * @param E - Energy eigenvalue (Joules)
    * @param V - Potential energy array (Joules)
-   * @param xGrid - Spatial grid (must be symmetric around x=0)
-   * @param dx - Grid spacing (meters)
+   * @param grid - Spatial grid configuration (should be symmetric around x=0)
    * @param parity - 'symmetric' or 'antisymmetric'
    * @returns Wavefunction array
    */
   public integrateFromCenter(
     E: number,
     V: number[],
-    xGrid: number[],
-    dx: number,
+    grid: XGrid,
     parity: Parity
   ): number[] {
-    const N = xGrid.length;
+    const N = grid.getLength();
+    const dx = grid.getDx();
     const psi = new Array( N ).fill( 0 );
 
     // Find center index (closest to x=0)
-    const centerIdx = this.findCenterIndex( xGrid );
+    const centerIdx = grid.findCenterIndex();
 
     // Calculate k²(x) and Numerov factors
     const k2 = this.calculateK2( E, V );
@@ -82,27 +82,6 @@ export default class SymmetricNumerovIntegrator {
     this.applyParity( psi, centerIdx, parity );
 
     return psi;
-  }
-
-  /**
-   * Find the grid index closest to x=0.
-   *
-   * @param xGrid - Spatial grid
-   * @returns Index of center point
-   */
-  private findCenterIndex( xGrid: number[] ): number {
-    let centerIdx = 0;
-    let minDist = Math.abs( xGrid[ 0 ] );
-
-    for ( let i = 1; i < xGrid.length; i++ ) {
-      const dist = Math.abs( xGrid[ i ] );
-      if ( dist < minDist ) {
-        minDist = dist;
-        centerIdx = i;
-      }
-    }
-
-    return centerIdx;
   }
 
   /**

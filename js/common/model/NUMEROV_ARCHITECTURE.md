@@ -26,7 +26,7 @@ NumerovSolver.ts (Main API)
 **Responsibility**: Integrates the Schrödinger equation using the Numerov method.
 
 **Key Methods**:
-- `integrate(E, V, xGrid, dx)` - Performs forward integration
+- `integrate(E, V, grid)` - Performs forward integration
 
 **Features**:
 - Implements 6th-order accurate Numerov formula
@@ -35,15 +35,16 @@ NumerovSolver.ts (Main API)
 
 **Usage**:
 ```typescript
+const grid = new XGrid(xMin, xMax, numPoints);
 const integrator = new NumerovIntegrator(mass);
-const psi = integrator.integrate(energy, potential, xGrid, dx);
+const psi = integrator.integrate(energy, potential, grid);
 ```
 
 ### 2. SymmetricNumerovIntegrator
 **Responsibility**: Handles integration for symmetric potentials using parity.
 
 **Key Methods**:
-- `integrateFromCenter(E, V, xGrid, dx, parity)` - Integrates from x=0 using symmetry
+- `integrateFromCenter(E, V, grid, parity)` - Integrates from x=0 using symmetry
 
 **Features**:
 - Exploits V(-x) = V(x) symmetry
@@ -52,15 +53,16 @@ const psi = integrator.integrate(energy, potential, xGrid, dx);
 
 **Usage**:
 ```typescript
+const grid = new XGrid(xMin, xMax, numPoints);
 const symIntegrator = new SymmetricNumerovIntegrator(mass);
-const psi = symIntegrator.integrateFromCenter(energy, potential, xGrid, dx, 'symmetric');
+const psi = symIntegrator.integrateFromCenter(energy, potential, grid, 'symmetric');
 ```
 
 ### 3. EnergyRefiner
 **Responsibility**: Refines energy eigenvalues using bisection method.
 
 **Key Methods**:
-- `refine(E1, E2, V, xGrid, dx)` - Refines energy within bounds
+- `refine(E1, E2, V, grid)` - Refines energy within bounds
 - `estimateIterations(E1, E2)` - Estimates refinement iterations
 - `areValidBounds(E1, E2)` - Validates energy bounds
 
@@ -71,8 +73,9 @@ const psi = symIntegrator.integrateFromCenter(energy, potential, xGrid, dx, 'sym
 
 **Usage**:
 ```typescript
+const grid = new XGrid(xMin, xMax, numPoints);
 const refiner = new EnergyRefiner(integrator, tolerance);
-const refinedEnergy = refiner.refine(E_lower, E_upper, potential, xGrid, dx);
+const refinedEnergy = refiner.refine(E_lower, E_upper, potential, grid);
 ```
 
 ### 4. WavefunctionNormalizer
@@ -199,19 +202,20 @@ Each class should be tested independently:
 
 ```typescript
 // Test NumerovIntegrator
+const grid = new XGrid(xMin, xMax, numPoints);
 const integrator = new NumerovIntegrator(ELECTRON_MASS);
-const psi = integrator.integrate(energy, potential, xGrid, dx);
-assert(psi.length === xGrid.length);
+const psi = integrator.integrate(energy, potential, grid);
+assert(psi.length === grid.getLength());
 
 // Test EnergyRefiner
 const refiner = new EnergyRefiner(integrator, 1e-10);
-const refined = refiner.refine(E1, E2, potential, xGrid, dx);
+const refined = refiner.refine(E1, E2, potential, grid);
 assert(Math.abs(refined - expected) < tolerance);
 
 // Test WavefunctionNormalizer
 const normalizer = new WavefunctionNormalizer('simpson');
-const normalized = normalizer.normalize(psi, dx);
-assert(normalizer.isNormalized(normalized, dx));
+const normalized = normalizer.normalize(psi, grid.getDx());
+assert(normalizer.isNormalized(normalized, grid.getDx()));
 ```
 
 ## Performance Considerations

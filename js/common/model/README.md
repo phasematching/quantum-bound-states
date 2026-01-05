@@ -121,9 +121,11 @@ Integrates the Schrödinger equation using the 6th-order accurate Numerov method
 **Example:**
 ```typescript
 import NumerovIntegrator from './NumerovIntegrator.js';
+import XGrid from './XGrid.js';
 
+const grid = new XGrid( xMin, xMax, numPoints );
 const integrator = new NumerovIntegrator( mass );
-const psi = integrator.integrate( energy, potentialArray, xGrid, dx );
+const psi = integrator.integrate( energy, potentialArray, grid );
 ```
 
 ### SymmetricNumerovIntegrator
@@ -137,9 +139,11 @@ Exploits parity symmetry for symmetric potentials to improve efficiency.
 **Example:**
 ```typescript
 import SymmetricNumerovIntegrator from './SymmetricNumerovIntegrator.js';
+import XGrid from './XGrid.js';
 
+const grid = new XGrid( xMin, xMax, numPoints );
 const integrator = new SymmetricNumerovIntegrator( mass );
-const psi = integrator.integrateFromCenter( energy, V, xGrid, dx, 'symmetric' );
+const psi = integrator.integrateFromCenter( energy, V, grid, 'symmetric' );
 ```
 
 ### EnergyRefiner
@@ -153,9 +157,11 @@ Refines energy eigenvalues using bisection to find precise energies where `ψ(x_
 **Example:**
 ```typescript
 import EnergyRefiner from './EnergyRefiner.js';
+import XGrid from './XGrid.js';
 
+const grid = new XGrid( xMin, xMax, numPoints );
 const refiner = new EnergyRefiner( integrator, 1e-21 );
-const refinedEnergy = refiner.refine( E_lower, E_upper, V, xGrid, dx );
+const refinedEnergy = refiner.refine( E_lower, E_upper, V, grid );
 ```
 
 ### WavefunctionNormalizer

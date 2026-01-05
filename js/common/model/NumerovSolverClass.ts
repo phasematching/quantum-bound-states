@@ -43,6 +43,7 @@ import NumerovIntegrator from './NumerovIntegrator.js';
 import SymmetricNumerovIntegrator, { Parity } from './SymmetricNumerovIntegrator.js';
 import EnergyRefiner from './EnergyRefiner.js';
 import WavefunctionNormalizer, { NormalizationMethod } from './WavefunctionNormalizer.js';
+import XGrid from './XGrid.js';
 
 /**
  * Configuration options for the solver.
@@ -121,20 +122,19 @@ export default class NumerovSolverClass {
     energyMax: number
   ): BoundStateResult {
     const { xMin, xMax, numPoints } = gridConfig;
-    const dx = ( xMax - xMin ) / ( numPoints - 1 );
 
-    // Generate grid
-    const xGrid = this.generateGrid( xMin, xMax, numPoints );
+    // Create grid
+    const grid = new XGrid( xMin, xMax, numPoints );
 
-    // Evaluate potential on grid
+    // Generate grid array and evaluate potential
+    const xGrid = grid.getArray();
     const V = this.evaluatePotential( potential, xGrid );
 
     // Find bound states
     const { energies, wavefunctions } = this.findBoundStates(
       potential,
       V,
-      xGrid,
-      dx,
+      grid,
       numStates,
       energyMin,
       energyMax
@@ -196,15 +196,17 @@ export default class NumerovSolverClass {
     parity: Parity
   ): BoundStateResult {
     const { xMin, xMax, numPoints } = gridConfig;
-    const dx = ( xMax - xMin ) / ( numPoints - 1 );
 
-    const xGrid = this.generateGrid( xMin, xMax, numPoints );
+    // Create grid
+    const grid = new XGrid( xMin, xMax, numPoints );
+
+    // Generate grid array and evaluate potential
+    const xGrid = grid.getArray();
     const V = this.evaluatePotential( potential, xGrid );
 
     const { energies, wavefunctions } = this.findBoundStatesSymmetric(
       V,
-      xGrid,
-      dx,
+      grid,
       numStates,
       energyMin,
       energyMax,
@@ -225,8 +227,7 @@ export default class NumerovSolverClass {
   private findBoundStates(
     potential: PotentialFunction,
     V: number[],
-    xGrid: number[],
-    dx: number,
+    grid: XGrid,
     numStates: number,
     energyMin: number,
     energyMax: number
@@ -243,7 +244,7 @@ export default class NumerovSolverClass {
       E <= energyMax && energies.length < numStates;
       E += energyStep
     ) {
-      const psi = this.integrator.integrate( E, V, xGrid, dx );
+      const psi = this.integrator.integrate( E, V, grid );
       const endValue = this.getEndValue( psi );
 
       // Check for sign change (indicates bound state)
@@ -254,14 +255,13 @@ export default class NumerovSolverClass {
           E - energyStep,
           E,
           V,
-          xGrid,
-          dx
+          grid
         );
         energies.push( refinedEnergy );
 
         // Calculate and normalize wavefunction
-        const refinedPsi = this.integrator.integrate( refinedEnergy, V, xGrid, dx );
-        const normalizedPsi = this.normalizer.normalize( refinedPsi, dx );
+        const refinedPsi = this.integrator.integrate( refinedEnergy, V, grid );
+        const normalizedPsi = this.normalizer.normalize( refinedPsi, grid.getDx() );
         wavefunctions.push( normalizedPsi );
       }
       prevSign = currentSign;
@@ -275,8 +275,7 @@ export default class NumerovSolverClass {
    */
   private findBoundStatesSymmetric(
     V: number[],
-    xGrid: number[],
-    dx: number,
+    grid: XGrid,
     numStates: number,
     energyMin: number,
     energyMax: number,
@@ -293,7 +292,7 @@ export default class NumerovSolverClass {
       E <= energyMax && energies.length < numStates;
       E += energyStep
     ) {
-      const psi = this.symmetricIntegrator.integrateFromCenter( E, V, xGrid, dx, parity );
+      const psi = this.symmetricIntegrator.integrateFromCenter( E, V, grid, parity );
       const endValue = this.getEndValue( psi );
 
       const currentSign = Math.sign( endValue );
@@ -303,8 +302,7 @@ export default class NumerovSolverClass {
           E - energyStep,
           E,
           V,
-          xGrid,
-          dx,
+          grid,
           parity
         );
         energies.push( refinedEnergy );
@@ -312,11 +310,10 @@ export default class NumerovSolverClass {
         const refinedPsi = this.symmetricIntegrator.integrateFromCenter(
           refinedEnergy,
           V,
-          xGrid,
-          dx,
+          grid,
           parity
         );
-        const normalizedPsi = this.normalizer.normalize( refinedPsi, dx );
+        const normalizedPsi = this.normalizer.normalize( refinedPsi, grid.getDx() );
         wavefunctions.push( normalizedPsi );
       }
       prevSign = currentSign;
@@ -333,11 +330,10 @@ export default class NumerovSolverClass {
     E1: number,
     E2: number,
     V: number[],
-    xGrid: number[],
-    dx: number,
+    grid: XGrid,
     parity: Parity
   ): number {
-    const N = xGrid.length;
+    const N = grid.getLength();
     const tolerance = 1e-10;
     let Elow = E1;
     let Ehigh = E2;
@@ -345,8 +341,8 @@ export default class NumerovSolverClass {
     while ( Ehigh - Elow > tolerance ) {
       const Emid = ( Elow + Ehigh ) / 2;
 
-      const psiMid = this.symmetricIntegrator.integrateFromCenter( Emid, V, xGrid, dx, parity );
-      const psiLow = this.symmetricIntegrator.integrateFromCenter( Elow, V, xGrid, dx, parity );
+      const psiMid = this.symmetricIntegrator.integrateFromCenter( Emid, V, grid, parity );
+      const psiLow = this.symmetricIntegrator.integrateFromCenter( Elow, V, grid, parity );
 
       const endValueMid = psiMid[ N - 1 ];
       const endValueLow = psiLow[ N - 1 ];

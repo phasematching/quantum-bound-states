@@ -12,6 +12,7 @@
 
 import quantumBoundStates from '../../quantumBoundStates.js';
 import NumerovIntegrator from './NumerovIntegrator.js';
+import XGrid from './XGrid.js';
 
 export default class EnergyRefiner {
 
@@ -34,18 +35,16 @@ export default class EnergyRefiner {
    * @param E1 - Lower energy bound (Joules)
    * @param E2 - Upper energy bound (Joules)
    * @param V - Potential energy array (Joules)
-   * @param xGrid - Spatial grid (meters)
-   * @param dx - Grid spacing (meters)
+   * @param grid - Spatial grid configuration
    * @returns Refined energy eigenvalue (Joules)
    */
   public refine(
     E1: number,
     E2: number,
     V: number[],
-    xGrid: number[],
-    dx: number
+    grid: XGrid
   ): number {
-    const N = xGrid.length;
+    const N = grid.getLength();
     let Elow = E1;
     let Ehigh = E2;
 
@@ -54,8 +53,8 @@ export default class EnergyRefiner {
       const Emid = this.calculateMidpoint( Elow, Ehigh );
 
       // Integrate at midpoint and boundary energies
-      const psiMid = this.integrator.integrate( Emid, V, xGrid, dx );
-      const psiLow = this.integrator.integrate( Elow, V, xGrid, dx );
+      const psiMid = this.integrator.integrate( Emid, V, grid );
+      const psiLow = this.integrator.integrate( Elow, V, grid );
 
       const endValueMid = this.getEndValue( psiMid, N );
       const endValueLow = this.getEndValue( psiLow, N );
@@ -79,8 +78,7 @@ export default class EnergyRefiner {
    * @param E1 - Lower energy bound (Joules)
    * @param E2 - Upper energy bound (Joules)
    * @param V - Potential energy array (Joules)
-   * @param xGrid - Spatial grid (meters)
-   * @param dx - Grid spacing (meters)
+   * @param grid - Spatial grid configuration
    * @param customTolerance - Custom energy tolerance (Joules)
    * @returns Refined energy eigenvalue (Joules)
    */
@@ -88,12 +86,11 @@ export default class EnergyRefiner {
     E1: number,
     E2: number,
     V: number[],
-    xGrid: number[],
-    dx: number,
+    grid: XGrid,
     customTolerance: number
   ): number {
     const tempRefiner = new EnergyRefiner( this.integrator, customTolerance );
-    return tempRefiner.refine( E1, E2, V, xGrid, dx );
+    return tempRefiner.refine( E1, E2, V, grid );
   }
 
   /**
