@@ -42,6 +42,9 @@ export default class NumerovIntegrator {
     const N = grid.getLength();
     const dx = grid.getDx();
 
+    // Validate that V array matches grid length
+    assert && assert( V.length === N, `V.length (${V.length}) must equal grid.getLength() (${N})` );
+
     // initialization of the wavefunction array
     const psi = new Array( N ).fill( 0 );
 

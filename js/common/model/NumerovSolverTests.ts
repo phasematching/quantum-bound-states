@@ -99,14 +99,19 @@ QUnit.test( 'Wavefunction Normalization', assert => {
   const k = mass * omega * omega;
   const potential = ( x: number ) => 0.5 * k * x * x;
 
+  // Use grid based on turning point for better numerical accuracy
+  const E0 = 0.5 * HBAR * omega;
+  const x_turn = Math.sqrt( 2 * E0 / k );
   const gridConfig = {
-    xMin: -10e-9,
-    xMax: 10e-9,
+    xMin: -6 * x_turn,
+    xMax: 6 * x_turn,
     numPoints: 1001
   };
 
-  const E0 = 0.5 * HBAR * omega;
   const result = solveNumerov( potential, mass, 20, gridConfig, 0.1 * E0, 20.5 * HBAR * omega );
+
+  // Ensure we found some states
+  assert.ok( result.wavefunctions.length > 0, `Found ${result.wavefunctions.length} states` );
 
   const dx = ( gridConfig.xMax - gridConfig.xMin ) / ( gridConfig.numPoints - 1 );
 
@@ -133,14 +138,19 @@ QUnit.test( 'Node Counting', assert => {
   const k = mass * omega * omega;
   const potential = ( x: number ) => 0.5 * k * x * x;
 
+  // Use grid based on turning point for better numerical accuracy
+  const E0 = 0.5 * HBAR * omega;
+  const x_turn = Math.sqrt( 2 * E0 / k );
   const gridConfig = {
-    xMin: -10e-9,
-    xMax: 10e-9,
+    xMin: -6 * x_turn,
+    xMax: 6 * x_turn,
     numPoints: 1001
   };
 
-  const E0 = 0.5 * HBAR * omega;
   const result = solveNumerov( potential, mass, 20, gridConfig, 0.1 * E0, 20.5 * HBAR * omega );
+
+  // Ensure we found some states
+  assert.ok( result.wavefunctions.length > 0, `Found ${result.wavefunctions.length} states` );
 
   for ( let n = 0; n < result.wavefunctions.length; n++ ) {
     const psi = result.wavefunctions[ n ];
