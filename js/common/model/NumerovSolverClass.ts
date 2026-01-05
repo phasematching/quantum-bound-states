@@ -48,7 +48,7 @@ import WavefunctionNormalizer, { NormalizationMethod } from './WavefunctionNorma
  * Configuration options for the solver.
  */
 export type NumerovSolverConfig = {
-  energyTolerance?: number;  // Tolerance for energy refinement (default: 1e-10 J)
+  energyTolerance?: number;  // Tolerance for energy refinement (default: 1e-20 J)
   normalizationMethod?: NormalizationMethod;  // Method for normalization (default: 'trapezoidal')
   useSymmetry?: boolean;  // Whether to use symmetric integration for symmetric potentials (default: false)
 };

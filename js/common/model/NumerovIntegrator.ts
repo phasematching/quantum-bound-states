@@ -16,17 +16,17 @@
 import quantumBoundStates from '../../quantumBoundStates.js';
 import FundamentalConstants from './FundamentalConstants.js';
 
+const HBAR = FundamentalConstants.HBAR;
+
 export default class NumerovIntegrator {
 
   private readonly mass: number;
-  private readonly HBAR: number;
 
   /**
    * @param mass - Particle mass in kg
    */
   public constructor( mass: number ) {
     this.mass = mass;
-    this.HBAR = FundamentalConstants.HBAR;
   }
 
   /**
@@ -75,7 +75,7 @@ export default class NumerovIntegrator {
    * @returns Array of k² values
    */
   private calculateK2( E: number, V: number[] ): number[] {
-    return V.map( v => ( 2 * this.mass * ( E - v ) ) / ( this.HBAR * this.HBAR ) );
+    return V.map( v => ( 2 * this.mass * ( E - v ) ) / ( HBAR * HBAR ) );
   }
 
   /**
