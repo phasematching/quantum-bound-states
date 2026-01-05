@@ -136,7 +136,7 @@ const result = solveNumerov(
   potential,
   QuantumConstants.ELECTRON_MASS,
   3,  // Find first 3 states
-  { xMin: -5e-9, xMax: 5e-9, numPoints: 501 },
+  { xMin: -4e-9, xMax: 4e-9, numPoints: 1001 },
   energyMin,
   energyMax
 );

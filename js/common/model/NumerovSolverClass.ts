@@ -19,7 +19,7 @@
  * const result = solver.solve(
  *   potential,
  *   3,  // Find first 3 states
- *   { xMin: -5e-9, xMax: 5e-9, numPoints: 501 },
+ *   { xMin: -4e-9, xMax: 4e-9, numPoints: 1001 },
  *   0,
  *   10 * FundamentalConstants.EV_TO_JOULES
  * );
@@ -105,7 +105,7 @@ export default class NumerovSolverClass {
    * const result = solver.solve(
    *   potential,
    *   5,  // Find first 5 states
-   *   { xMin: -6e-9, xMax: 6e-9, numPoints: 1001 },
+   *   { xMin: -4e-9, xMax: 4e-9, numPoints: 1001 },
    *   0,  // Ground state is above 0
    *   20 * FundamentalConstants.EV_TO_JOULES
    * );
@@ -127,8 +127,8 @@ export default class NumerovSolverClass {
     const grid = new XGrid( xMin, xMax, numPoints );
 
     // Generate grid array and evaluate potential
-    const xGrid = grid.getArray();
-    const V = this.evaluatePotential( potential, xGrid );
+    const xGridArray = grid.getArray();
+    const V = this.evaluatePotential( potential, xGridArray );
 
     // Find bound states
     const { energies, wavefunctions } = this.findBoundStates(
@@ -143,7 +143,7 @@ export default class NumerovSolverClass {
     return {
       energies: energies,
       wavefunctions: wavefunctions,
-      xGrid: xGrid,
+      xGrid: xGridArray,
       method: 'numerov'
     };
   }
@@ -171,7 +171,7 @@ export default class NumerovSolverClass {
    * const evenStates = solver.solveSymmetric(
    *   harmonicPotential,
    *   3,  // Find 3 even states
-   *   { xMin: -6e-9, xMax: 6e-9, numPoints: 1001 },
+   *   { xMin: -4e-9, xMax: 4e-9, numPoints: 1001 },
    *   0,
    *   20 * FundamentalConstants.EV_TO_JOULES,
    *   'symmetric'
@@ -181,7 +181,7 @@ export default class NumerovSolverClass {
    * const oddStates = solver.solveSymmetric(
    *   harmonicPotential,
    *   3,
-   *   { xMin: -6e-9, xMax: 6e-9, numPoints: 1001 },
+   *   { xMin: -4e-9, xMax: 4e-9, numPoints: 1001 },
    *   0,
    *   20 * FundamentalConstants.EV_TO_JOULES,
    *   'antisymmetric'

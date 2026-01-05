@@ -36,7 +36,7 @@ const result = solveNumerov(
   potential,
   FundamentalConstants.ELECTRON_MASS,
   3,  // Number of states to find
-  { xMin: -5e-9, xMax: 5e-9, numPoints: 501 },
+  { xMin: -4e-9, xMax: 4e-9, numPoints: 1001 },
   0,  // Minimum energy
   10 * FundamentalConstants.EV_TO_JOULES  // Maximum energy
 );
@@ -201,7 +201,7 @@ Type definitions for potentials and results:
 import type { PotentialFunction, GridConfig, BoundStateResult } from './PotentialFunction.js';
 
 const potential: PotentialFunction = ( x: number ) => /* ... */;
-const grid: GridConfig = { xMin: -5e-9, xMax: 5e-9, numPoints: 501 };
+const grid: GridConfig = { xMin: -4e-9, xMax: 4e-9, numPoints: 1001 };
 ```
 
 ## Testing

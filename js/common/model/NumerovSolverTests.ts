@@ -20,18 +20,17 @@ const EV_TO_JOULES = FundamentalConstants.EV_TO_JOULES;
 QUnit.test( 'Harmonic Oscillator', assert => {
 
   const mass = ELECTRON_MASS;  // kg
-  const omega = 1e15;  // rad/s
+  const omega = 2e15;  // rad/s
   const k = mass * omega * omega;  // J/m^2
   const potential = ( x: number ) => 0.5 * k * x * x;  // J
 
   // Energy of the ground state
   const E0 = 0.5 * HBAR * omega;  // J
 
-  // Turning point radius
-  const x_turn = Math.sqrt( 2 * E0 / k );
+  // Use standard grid from -4nm to 4nm
   const gridConfig = {
-    xMin: -6 * x_turn,  // m
-    xMax: 6 * x_turn,  // m
+    xMin: -4e-9,  // m
+    xMax: 4e-9,  // m
     numPoints: 1001  // number of points
   };
 
@@ -59,13 +58,14 @@ QUnit.test( 'Harmonic Oscillator', assert => {
 QUnit.test( 'Infinite Square Well', assert => {
 
   const mass = ELECTRON_MASS;
-  const L = 1e-9;
+  const L = 2e-9;
   const V0 = 500 * EV_TO_JOULES;
   const potential = ( x: number ) => Math.abs( x ) < L / 2 ? 0 : V0;
 
+  // Use standard grid from -4nm to 4nm
   const gridConfig = {
-    xMin: -0.6 * L,
-    xMax: 0.6 * L,
+    xMin: -4e-9,
+    xMax: 4e-9,
     numPoints: 1001
   };
 
@@ -99,12 +99,11 @@ QUnit.test( 'Wavefunction Normalization', assert => {
   const k = mass * omega * omega;
   const potential = ( x: number ) => 0.5 * k * x * x;
 
-  // Use grid based on turning point for better numerical accuracy
+  // Use standard grid from -4nm to 4nm
   const E0 = 0.5 * HBAR * omega;
-  const x_turn = Math.sqrt( 2 * E0 / k );
   const gridConfig = {
-    xMin: -6 * x_turn,
-    xMax: 6 * x_turn,
+    xMin: -4e-9,
+    xMax: 4e-9,
     numPoints: 1001
   };
 
@@ -138,12 +137,11 @@ QUnit.test( 'Node Counting', assert => {
   const k = mass * omega * omega;
   const potential = ( x: number ) => 0.5 * k * x * x;
 
-  // Use grid based on turning point for better numerical accuracy
+  // Use standard grid from -4nm to 4nm
   const E0 = 0.5 * HBAR * omega;
-  const x_turn = Math.sqrt( 2 * E0 / k );
   const gridConfig = {
-    xMin: -6 * x_turn,
-    xMax: 6 * x_turn,
+    xMin: -4e-9,
+    xMax: 4e-9,
     numPoints: 1001
   };
 
