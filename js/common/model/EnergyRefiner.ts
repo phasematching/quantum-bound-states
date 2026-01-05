@@ -21,9 +21,9 @@ export default class EnergyRefiner {
 
   /**
    * @param integrator - The Numerov integrator to use
-   * @param tolerance - Energy tolerance in Joules (default: 1e-21)
+   * @param tolerance - Energy tolerance in Joules
    */
-  public constructor( integrator: NumerovIntegrator, tolerance = 1e-21 ) {
+  public constructor( integrator: NumerovIntegrator, tolerance = 1e-22 ) {
     this.integrator = integrator;
     this.tolerance = tolerance;
   }
@@ -47,9 +47,11 @@ export default class EnergyRefiner {
     const N = grid.getLength();
     let Elow = E1;
     let Ehigh = E2;
+    let iterations = 0;
 
     // Bisection loop
     while ( Ehigh - Elow > this.tolerance ) {
+      iterations++;
       const Emid = this.calculateMidpoint( Elow, Ehigh );
 
       // Integrate at midpoint and boundary energies
@@ -68,6 +70,7 @@ export default class EnergyRefiner {
       }
     }
 
+    console.log( `EnergyRefiner: Converged in ${iterations} iterations (tolerance: ${this.tolerance} J, final range: ${Ehigh - Elow} J)` );
     return this.calculateMidpoint( Elow, Ehigh );
   }
 

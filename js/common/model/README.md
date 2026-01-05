@@ -47,22 +47,6 @@ console.log( 'Wavefunctions:', result.wavefunctions );
 console.log( 'Grid:', result.xGrid );
 ```
 
-### Advanced Usage with Configuration
-
-```typescript
-import { NumerovSolverClass } from './NumerovSolver.js';
-
-const solver = new NumerovSolverClass(
-  FundamentalConstants.ELECTRON_MASS,
-  {
-    energyTolerance: 1e-12,  // Energy precision
-    normalizationMethod: 'simpson'  // Higher accuracy normalization
-  }
-);
-
-const result = solver.solve( potential, 3, gridConfig, energyMin, energyMax );
-```
-
 ### Symmetric Potentials
 
 For symmetric potentials `V(-x) = V(x)`, you can improve efficiency and accuracy:
@@ -343,15 +327,6 @@ common/model/
    - Set `energyMin` below the ground state energy
    - Set `energyMax` above the highest state of interest
    - For potential wells: `energyMin` = well depth, `energyMax` = 0
-
-3. **Boundary Conditions**:
-   - Ensure grid extends to regions where `ψ ≈ 0`
-   - Typically 3-5 classical turning points from center
-
-4. **Tolerance**:
-   - Default energy tolerance (1e-20 J) is suitable for most cases
-   - For visualization: 'max' normalization is clearer
-   - For calculations: 'simpson' normalization is more accurate
 
 ## Known Limitations
 

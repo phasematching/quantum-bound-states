@@ -66,7 +66,7 @@ const psi = symIntegrator.integrateFromCenter(energy, potential, grid, 'symmetri
 
 **Features**:
 - Bisection method for root finding
-- Configurable tolerance (default: 1e-20 J)
+- Configurable tolerance
 - Searches for ψ(x_max) = 0 condition
 
 **Usage**:
@@ -112,7 +112,7 @@ const normalizedPsi = normalizer.normalize(psi, dx);
 **Usage**:
 ```typescript
 const solver = new NumerovSolverClass(mass, {
-  energyTolerance: 1e-20,
+  energyTolerance: 1e-24,
   normalizationMethod: 'simpson'
 });
 
@@ -147,7 +147,7 @@ import { NumerovSolverClass } from './NumerovSolver.js';
 const solver = new NumerovSolverClass(
   QuantumConstants.ELECTRON_MASS,
   {
-    energyTolerance: 1e-20,
+    energyTolerance: 1e-24,
     normalizationMethod: 'simpson'
   }
 );

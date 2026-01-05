@@ -13,26 +13,6 @@
  *
  * The TISE is: -ℏ²/(2m) d²ψ/dx² + V(x)ψ = Eψ
  *
- * @example
- * // Basic usage with default configuration
- * const solver = new NumerovSolverClass( FundamentalConstants.ELECTRON_MASS );
- * const result = solver.solve(
- *   potential,
- *   3,  // Find first 3 states
- *   { xMin: -4e-9, xMax: 4e-9, numPoints: 1001 },
- *   0,
- *   10 * FundamentalConstants.EV_TO_JOULES
- * );
- *
- * @example
- * // Advanced usage with custom configuration
- * const solver = new NumerovSolverClass(
- *   FundamentalConstants.ELECTRON_MASS,
- *   {
- *     energyTolerance: 1e-12,
- *     normalizationMethod: 'simpson'
- *   }
- * );
  *
  * @author Martin Veillette
  */
@@ -72,7 +52,7 @@ export default class NumerovSolverClass {
     this.symmetricIntegrator = new SymmetricNumerovIntegrator( mass );
     this.energyRefiner = new EnergyRefiner(
       this.integrator,
-      config?.energyTolerance ?? 1e-20
+      config?.energyTolerance ?? 1e-25
     );
     this.normalizer = new WavefunctionNormalizer(
       config?.normalizationMethod ?? 'trapezoidal'
@@ -334,7 +314,7 @@ export default class NumerovSolverClass {
     parity: Parity
   ): number {
     const N = grid.getLength();
-    const tolerance = 1e-10;
+    const tolerance = 1e-25;
     let Elow = E1;
     let Ehigh = E2;
 
