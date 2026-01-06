@@ -4,7 +4,7 @@
  * XGrid represents a uniformly-spaced 1D spatial grid for quantum mechanics calculations.
  * Encapsulates grid parameters and provides utilities for grid operations.
  *
- * This class eliminates redundancy by computing derived properties (dx, array values)
+ * This class eliminates redundancy by computing derived properties (dx, width, array values)
  * from the fundamental grid parameters (xMin, xMax, numPoints).
  *
  * @author Martin Veillette
@@ -49,6 +49,13 @@ export default class XGrid {
   }
 
   /**
+   * Get the width (in meters) of the grid.
+   */
+    public getWidth(): number {
+        return ( this.xMax - this.xMin ) ;
+    }
+
+  /**
    * Generate the array of x values.
    * @returns Array of spatial positions [x_0, x_1, ..., x_N-1]
    */
@@ -71,7 +78,7 @@ export default class XGrid {
   public findCenterIndex(): number {
     // For a grid from xMin to xMax, the index closest to x=0 is:
     // index = -xMin / (xMax - xMin) * (numPoints - 1)
-    const index = Utils.roundSymmetric( -this.xMin * ( this.numPoints - 1 ) / ( this.xMax - this.xMin ) );
+    const index = Utils.roundSymmetric( -this.xMin * ( this.numPoints - 1 ) / ( this.getWidth() ) );
 
     // Clamp to valid range
     return Math.max( 0, Math.min( this.numPoints - 1, index ) );
