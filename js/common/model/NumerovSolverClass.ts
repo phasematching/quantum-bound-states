@@ -37,6 +37,10 @@ export type NumerovSolverClassOptions = {
 
 export default class NumerovSolverClass {
 
+    // Number of energy steps for scanning in the shooting method
+    // This is a parameter that affect strongly the performance. A larger value make the energy search moe  robust
+    private static readonly ENERGY_SCAN_STEPS = 200;
+
     private readonly integrator: NumerovIntegrator;
     private readonly symmetricIntegrator: SymmetricNumerovIntegrator;
     private readonly energyRefiner: EnergyRefiner;
@@ -210,7 +214,7 @@ export default class NumerovSolverClass {
         const wavefunctions: number[][] = [];
 
         // Scan energy range looking for sign changes
-        const energyStep = ( energyMax - energyMin ) / 1000;
+        const energyStep = ( energyMax - energyMin ) / NumerovSolverClass.ENERGY_SCAN_STEPS;
 
         // Initialize prevSign by integrating at energyMin
         const psi0 = this.integrator.integrate( energyMin, V, grid );
