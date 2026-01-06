@@ -397,4 +397,4 @@ export function solveNumerov(
     return solver.solve( potential, gridConfig, energyMin, energyMax );
 }
 
-quantumBoundStates.register( 'NumerovSolver', { NumerovSolver: NumerovSolverClass, solveNumerov: solveNumerov } );
+quantumBoundStates.register( 'NumerovSolverClass', NumerovSolverClass );
