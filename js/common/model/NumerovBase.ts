@@ -12,6 +12,7 @@ import quantumBoundStates from '../../quantumBoundStates.js';
 import FundamentalConstants from './FundamentalConstants.js';
 
 const HBAR = FundamentalConstants.HBAR;
+const VERY_LARGE_VALUE = 1e300;
 
 export default abstract class NumerovBase {
 
@@ -78,7 +79,7 @@ export default abstract class NumerovBase {
    * @param startIndex - Index to start filling from
    * @param value - Value to fill with (defaults to 1e300)
    */
-  protected fillDivergent( psi: number[], startIndex: number, value = 1e300 ): void {
+  protected fillDivergent( psi: number[], startIndex: number, value = VERY_LARGE_VALUE ): void {
     for ( let k = startIndex; k < psi.length; k++ ) {
       psi[ k ] = value;
     }
