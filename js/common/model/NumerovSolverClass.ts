@@ -126,7 +126,7 @@ export default class NumerovSolverClass {
     return {
       energies: energies,
       wavefunctions: wavefunctions,
-      xGrid: xGridArray,
+      xGridArray: xGridArray,
       method: 'numerov'
     };
   }
@@ -184,8 +184,8 @@ export default class NumerovSolverClass {
     const grid = new XGrid( xMin, xMax, numPoints );
 
     // Generate grid array and evaluate potential
-    const xGrid = grid.getArray();
-    const V = this.evaluatePotential( potential, xGrid );
+    const xGridArray = grid.getArray();
+    const V = this.evaluatePotential( potential, xGridArray );
 
     const { energies, wavefunctions } = this.findBoundStatesSymmetric(
       V,
@@ -199,7 +199,7 @@ export default class NumerovSolverClass {
     return {
       energies: energies,
       wavefunctions: wavefunctions,
-      xGrid: xGrid,
+      xGridArray: xGridArray,
       method: 'numerov-symmetric'
     };
   }
@@ -373,8 +373,8 @@ export default class NumerovSolverClass {
   /**
    * Evaluate potential on grid.
    */
-  private evaluatePotential( potential: PotentialFunction, xGrid: number[] ): number[] {
-    return xGrid.map( potential );
+  private evaluatePotential( potential: PotentialFunction, xGridArray: number[] ): number[] {
+    return xGridArray.map( potential );
   }
 
   /**

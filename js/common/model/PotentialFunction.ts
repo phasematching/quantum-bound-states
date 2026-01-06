@@ -97,7 +97,7 @@ export type GridConfig = {
 export type BoundStateResult = {
   energies: number[];       // Energy eigenvalues in Joules (sorted from lowest to highest)
   wavefunctions: number[][]; // Normalized wavefunctions (each row is one state)
-  xGrid: number[];          // Spatial grid points in meters
+  xGridArray: number[];          // Spatial grid points in meters
   method: string;           // Name of the numerical method used ('numerov' or 'numerov-symmetric')
 };
 
