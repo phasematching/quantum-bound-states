@@ -5,7 +5,10 @@
  * Used to find the precise energy where the wavefunction satisfies boundary conditions.
  *
  * The shooting method looks for energies where ψ(x_max) = 0. We search for sign changes
- * in the end value, then refine using bisection to achieve the desired tolerance.
+ * in the end value of the wavefunction, then refine using bisection to achieve the desired tolerance.
+ *
+ * This is a very robust method in root finding, but it generates a lot of iterations, so it is not the most efficient.
+ * This approach could be refined if performance is needed.
  *
  * @author Martin Veillette
  */
@@ -14,37 +17,40 @@ import quantumBoundStates from '../../quantumBoundStates.js';
 import NumerovIntegrator from './NumerovIntegrator.js';
 import XGrid from './XGrid.js';
 
+// Default relative precision of 10^-4 gives absolute tolerance = 10^-4 × (bracket width)
+const DEFAULT_RELATIVE_TOLERANCE = 1e-4;
+
 export default class EnergyRefiner {
 
   private readonly integrator: NumerovIntegrator;
-  private readonly toleranceOverride?: number; // Optional user-specified tolerance
+  private readonly tolerance: number;
+  private readonly isRelative: boolean;
 
   /**
-   * @param integrator - The Numerov integrator to use
-   * @param tolerance - Optional energy tolerance in Joules. If not provided, tolerance is
-   *                    calculated adaptively based on the energy bracket width.
-   */
-  public constructor( integrator: NumerovIntegrator, tolerance?: number ) {
-    this.integrator = integrator;
-    this.toleranceOverride = tolerance;
-  }
-
-  /**
-   * Refine energy eigenvalue using bisection method.
-   * Searches for the energy where ψ(x_max) = 0 within the given bounds.
-   *
    * Physical motivation for tolerance:
    * The eigenvalue should be resolved to much better precision than the level spacing.
    * Typical quantum systems have level spacing ΔE, and we want tolerance << ΔE.
    *
    * The initial bracket width (E2 - E1) is typically a fraction of the level spacing
    * (from the energy scan that detected the sign change). A relative precision of
-   * 10^-8 ensures the eigenvalue is accurate to ~10 significant figures relative to
-   * the bracket width, which translates to ~10^-6 of the level spacing.
+   * 10^-4 ensures the eigenvalue is accurate to ~4 significant figures relative to
+   * the bracket width.
    *
-   * For example:
-   * - Harmonic oscillator (ΔE ≈ 0.66 eV): tolerance ≈ 10^-6 eV
-   * - Infinite well (ΔE ≈ 0.07 eV): tolerance ≈ 10^-7 eV
+   * @param integrator - The Numerov integrator to use
+   * @param tolerance - Energy tolerance value. If isRelative is true, this is a dimensionless
+   *                    relative tolerance. If isRelative is false, this is an absolute tolerance in Joules.
+   * @param isRelative - If true, tolerance is relative to the energy bracket width.
+   *                     If false, tolerance is an absolute value in Joules. Default is true.
+   */
+  public constructor( integrator: NumerovIntegrator, tolerance: number = DEFAULT_RELATIVE_TOLERANCE, isRelative: boolean = true ) {
+    this.integrator = integrator;
+    this.tolerance = tolerance;
+    this.isRelative = isRelative;
+  }
+
+  /**
+   * Refine energy eigenvalue using bisection method.
+   * Searches for the energy where ψ(x_max) = 0 within the given bounds.
    *
    * @param E1 - Lower energy bound (Joules)
    * @param E2 - Upper energy bound (Joules)
@@ -59,36 +65,35 @@ export default class EnergyRefiner {
     grid: XGrid
   ): number {
     const N = grid.getLength();
-    let Elow = E1;
-    let Ehigh = E2;
+    let energyLow = E1;
+    let energyHigh = E2;
 
-    // Calculate adaptive tolerance based on energy scale of the bracket
-    // Relative precision of 10^-8 gives absolute tolerance = 10^-8 × (bracket width)
-    // This ensures eigenvalue accuracy of ~10 significant figures
-    const relativePrecision = 1e-8;
-    const tolerance = this.toleranceOverride ?? relativePrecision * Math.abs( E2 - E1 );
+    // Convert tolerance to absolute value if it's relative
+    const absoluteTolerance = this.isRelative ?
+      this.tolerance * Math.abs( E2 - E1 ) :
+      this.tolerance;
 
     // Bisection loop
-    while ( Ehigh - Elow > tolerance ) {
-      const Emid = this.calculateMidpoint( Elow, Ehigh );
+    while ( energyHigh - energyLow > absoluteTolerance ) {
+      const energyMid = this.calculateMidpoint( energyLow, energyHigh );
 
       // Integrate at midpoint and boundary energies
-      const psiMid = this.integrator.integrate( Emid, V, grid );
-      const psiLow = this.integrator.integrate( Elow, V, grid );
+      const psiMid = this.integrator.integrate( energyMid, V, grid );
+      const psiLow = this.integrator.integrate( energyLow, V, grid );
 
       const endValueMid = this.getEndValue( psiMid, N );
       const endValueLow = this.getEndValue( psiLow, N );
 
       // Update bounds based on sign change
       if ( this.haveSameSign( endValueMid, endValueLow ) ) {
-        Elow = Emid;
+        energyLow = energyMid;
       }
       else {
-        Ehigh = Emid;
+        energyHigh = energyMid;
       }
     }
 
-    return this.calculateMidpoint( Elow, Ehigh );
+    return this.calculateMidpoint( energyLow, energyHigh );
   }
 
   /**

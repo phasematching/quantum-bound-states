@@ -30,7 +30,7 @@ import XGrid from './XGrid.js';
  */
 export type NumerovSolverConfig = {
   energyTolerance?: number;  // Optional tolerance for energy refinement (Joules).
-                             // If not provided, uses adaptive tolerance = 10^-8 × (bracket width)
+                             // If not provided, uses relative tolerance × (bracket width)
   normalizationMethod?: NormalizationMethod;  // Method for normalization (default: 'trapezoidal')
   useSymmetry?: boolean;  // Whether to use symmetric integration for symmetric potentials (default: false)
 };
@@ -53,10 +53,12 @@ export default class NumerovSolverClass {
     this.integrator = new NumerovIntegrator( mass );
     this.symmetricIntegrator = new SymmetricNumerovIntegrator( mass );
     this.energyToleranceOverride = config?.energyTolerance;
-    this.energyRefiner = new EnergyRefiner(
-      this.integrator,
-      this.energyToleranceOverride // If undefined, EnergyRefiner will use adaptive tolerance
-    );
+
+    // If energyTolerance is provided, it's absolute (in Joules); otherwise use default relative tolerance
+    this.energyRefiner = config?.energyTolerance !== undefined
+      ? new EnergyRefiner( this.integrator, config.energyTolerance, false ) // absolute tolerance
+      : new EnergyRefiner( this.integrator ); // default relative tolerance
+
     this.normalizer = new WavefunctionNormalizer(
       config?.normalizationMethod ?? 'trapezoidal'
     );
