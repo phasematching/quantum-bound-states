@@ -29,7 +29,12 @@ User API
 Supporting Classes
    ├── XGrid (spatial grid)
    ├── FundamentalConstants (physical constants)
-   └── PotentialFunction (type definitions)
+   ├── PotentialFunction (type definitions)
+   └── analytical-solutions/ (validation)
+         ├── HarmonicOscillatorSolution
+         ├── InfiniteSquareWellSolution
+         ├── FiniteSquareWellSolution
+         └── math-utilities
 ```
 
 ## The Numerov Method
@@ -215,6 +220,55 @@ Key types:
 - `GridConfig`: {xMin, xMax, numPoints}
 - `BoundStateResult`: {energies, wavefunctions, xGrid, method}
 - `Parity`: 'symmetric' | 'antisymmetric'
+
+---
+
+## Analytical Solutions (analytical-solutions/)
+
+This subdirectory contains exact analytical solutions for quantum systems that can be solved mathematically. These modules serve two purposes:
+
+1. **Validation**: Test the numerical solver against known exact solutions
+2. **Reference**: Provide baseline for comparison in tests
+
+### HarmonicOscillatorSolution.ts
+**Purpose**: Exact solutions for the quantum harmonic oscillator
+**Key formulas**:
+- Energy eigenvalues: E_n = ℏω(n + ½) for n = 0, 1, 2, ...
+- Wavefunctions: Hermite polynomials × Gaussian envelope
+- All states are bound (infinite tower of levels)
+
+Used to validate the Numerov solver for a symmetric, smooth potential.
+
+---
+
+### InfiniteSquareWellSolution.ts
+**Purpose**: Exact solutions for particle in a box
+**Key formulas**:
+- Energy eigenvalues: E_n = n²π²ℏ²/(2mL²) for n = 1, 2, 3, ...
+- Wavefunctions: ψ_n(x) = √(2/L) sin(nπx/L)
+- Hard boundary conditions (ψ = 0 at walls)
+
+Used to validate the solver for discontinuous potentials and hard boundaries.
+
+---
+
+### FiniteSquareWellSolution.ts
+**Purpose**: Exact solutions for finite square well
+**Key formulas**:
+- Transcendental equations for bound states (must be solved numerically)
+- Exponentially decaying tails in classically forbidden regions
+- Finite number of bound states (depends on well depth)
+
+Used to validate the solver for potentials with both bound and unbound regions.
+
+---
+
+### math-utilities.ts
+**Purpose**: Mathematical helper functions
+**Contents**:
+- Special functions (Hermite polynomials, factorials)
+- Numerical utilities for analytical solutions
+- Shared mathematical operations
 
 ---
 
