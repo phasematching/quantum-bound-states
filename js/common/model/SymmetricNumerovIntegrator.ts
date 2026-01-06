@@ -73,7 +73,7 @@ export default class SymmetricNumerovIntegrator {
     const f = this.calculateNumerovFactors( k2, dx );
 
     // Set initial conditions based on parity
-    this.setInitialConditions( psi, f, centerIdx, dx, parity );
+    this.setInitialConditions( psi, f, centerIdx, dx, N, parity );
 
     // Integrate from center to right boundary
     this.integrateForward( psi, f, centerIdx );
@@ -101,11 +101,13 @@ export default class SymmetricNumerovIntegrator {
 
   /**
    * Set initial conditions at x=0 based on parity.
+   * Uses physically-motivated scales based on dimensional analysis: ψ ~ 1/√L
    *
    * @param psi - Wavefunction array (modified in place)
    * @param f - Numerov factors
    * @param centerIdx - Center index
    * @param dx - Grid spacing
+   * @param N - Number of grid points
    * @param parity - Symmetry type
    */
   private setInitialConditions(
@@ -113,23 +115,29 @@ export default class SymmetricNumerovIntegrator {
     f: number[],
     centerIdx: number,
     dx: number,
+    N: number,
     parity: Parity
   ): void {
+    // Physical scale: For a bound state in region of size L, ψ ~ 1/√L
+    const L = N * dx; // Total domain size (meters)
+    const psiScale = 1 / Math.sqrt( L ); // Natural scale ensures correct units [1/√m]
+
     if ( parity === 'symmetric' ) {
       // Symmetric state: ψ(-x) = ψ(x)
-      // At x=0: ψ'(0) = 0 (derivative must be zero)
+      // At x=0: ψ'(0) = 0 (derivative must be zero by symmetry)
       // Use Taylor expansion: ψ(dx) ≈ ψ(0) + ψ''(0)·dx²/2
-      // From Schrödinger equation: ψ'' = -k²ψ
-      // So ψ(dx) = ψ(0)·(1 - k²·dx²/2) = ψ(0)·(1 - 6f) where f = k²·dx²/12
-      psi[ centerIdx ] = 1.0;
-      psi[ centerIdx + 1 ] = 1.0 * ( 1 - 6 * f[ centerIdx ] );
+      // From Schrödinger equation: ψ''(x) = -k²(x)ψ(x)
+      // Therefore: ψ(dx) = ψ(0)·[1 - k²·dx²/2] = ψ(0)·[1 - 6f] where f = k²·dx²/12
+      psi[ centerIdx ] = psiScale;
+      psi[ centerIdx + 1 ] = psi[ centerIdx ] * ( 1 - 6 * f[ centerIdx ] );
     }
     else {
       // Antisymmetric state: ψ(-x) = -ψ(x)
-      // At x=0: ψ(0) = 0 (wavefunction must be zero)
-      // ψ(dx) ≈ ψ'(0)*dx (linear start)
+      // At x=0: ψ(0) = 0 (wavefunction must vanish by antisymmetry)
+      // Near origin: ψ(x) ≈ ψ'(0)·x (linear start)
+      // Scale ψ'(0) ~ ψ_typical/L ~ 1/L^(3/2) to get ψ(dx) ~ 1/√L at distance L
       psi[ centerIdx ] = 0.0;
-      psi[ centerIdx + 1 ] = dx;
+      psi[ centerIdx + 1 ] = psiScale * dx / Math.sqrt( dx ); // ψ'(0)·dx where ψ'(0) ~ 1/L^(3/2)
     }
   }
 
@@ -161,7 +169,7 @@ export default class SymmetricNumerovIntegrator {
    */
   private fillInfinity( psi: number[], startIdx: number ): void {
     for ( let k = startIdx; k < psi.length; k++ ) {
-      psi[ k ] = 1e100;
+      psi[ k ] = 1e300;
     }
   }
 

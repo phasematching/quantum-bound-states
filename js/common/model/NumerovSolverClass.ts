@@ -29,7 +29,8 @@ import XGrid from './XGrid.js';
  * Configuration options for the solver.
  */
 export type NumerovSolverConfig = {
-  energyTolerance?: number;  // Tolerance for energy refinement (default: 1e-20 J)
+  energyTolerance?: number;  // Optional tolerance for energy refinement (Joules).
+                             // If not provided, uses adaptive tolerance = 10^-8 × (bracket width)
   normalizationMethod?: NormalizationMethod;  // Method for normalization (default: 'trapezoidal')
   useSymmetry?: boolean;  // Whether to use symmetric integration for symmetric potentials (default: false)
 };
@@ -41,6 +42,7 @@ export default class NumerovSolverClass {
   private readonly energyRefiner: EnergyRefiner;
   private readonly normalizer: WavefunctionNormalizer;
   private readonly useSymmetry: boolean;
+  private readonly energyToleranceOverride?: number;
 
   /**
    * @param mass - Particle mass in kg
@@ -50,9 +52,10 @@ export default class NumerovSolverClass {
     // Create component instances
     this.integrator = new NumerovIntegrator( mass );
     this.symmetricIntegrator = new SymmetricNumerovIntegrator( mass );
+    this.energyToleranceOverride = config?.energyTolerance;
     this.energyRefiner = new EnergyRefiner(
       this.integrator,
-      config?.energyTolerance ?? 1e-25
+      this.energyToleranceOverride // If undefined, EnergyRefiner will use adaptive tolerance
     );
     this.normalizer = new WavefunctionNormalizer(
       config?.normalizationMethod ?? 'trapezoidal'
@@ -217,10 +220,15 @@ export default class NumerovSolverClass {
 
     // Scan energy range looking for sign changes
     const energyStep = ( energyMax - energyMin ) / 1000;
-    let prevSign = 0;
+
+    // Initialize prevSign by integrating at energyMin
+    const psi0 = this.integrator.integrate( energyMin, V, grid );
+    const endValue0 = this.getEndValue( psi0 );
+    let prevSign = Math.sign( endValue0 );
+    let prevEnergy = energyMin;
 
     for (
-      let E = energyMin;
+      let E = energyMin + energyStep;
       E <= energyMax && energies.length < numStates;
       E += energyStep
     ) {
@@ -229,10 +237,11 @@ export default class NumerovSolverClass {
 
       // Check for sign change (indicates bound state)
       const currentSign = Math.sign( endValue );
-      if ( prevSign !== 0 && currentSign !== prevSign ) {
+
+      if ( currentSign !== 0 && prevSign !== 0 && currentSign !== prevSign ) {
         // Refine energy
         const refinedEnergy = this.energyRefiner.refine(
-          E - energyStep,
+          prevEnergy,
           E,
           V,
           grid
@@ -244,7 +253,11 @@ export default class NumerovSolverClass {
         const normalizedPsi = this.normalizer.normalize( refinedPsi, grid.getDx() );
         wavefunctions.push( normalizedPsi );
       }
-      prevSign = currentSign;
+
+      if ( currentSign !== 0 ) {
+        prevSign = currentSign;
+        prevEnergy = E;
+      }
     }
 
     return { energies: energies, wavefunctions: wavefunctions };
@@ -265,10 +278,15 @@ export default class NumerovSolverClass {
     const wavefunctions: number[][] = [];
 
     const energyStep = ( energyMax - energyMin ) / 1000;
-    let prevSign = 0;
+
+    // Initialize prevSign by integrating at energyMin
+    const psi0 = this.symmetricIntegrator.integrateFromCenter( energyMin, V, grid, parity );
+    const endValue0 = this.getEndValue( psi0 );
+    let prevSign = Math.sign( endValue0 );
+    let prevEnergy = energyMin;
 
     for (
-      let E = energyMin;
+      let E = energyMin + energyStep;
       E <= energyMax && energies.length < numStates;
       E += energyStep
     ) {
@@ -276,14 +294,15 @@ export default class NumerovSolverClass {
       const endValue = this.getEndValue( psi );
 
       const currentSign = Math.sign( endValue );
-      if ( prevSign !== 0 && currentSign !== prevSign ) {
+      if ( currentSign !== 0 && prevSign !== 0 && currentSign !== prevSign ) {
         // For symmetric case, we need a custom refiner that uses symmetric integration
         const refinedEnergy = this.refineEnergySymmetric(
-          E - energyStep,
+          prevEnergy,
           E,
           V,
           grid,
-          parity
+          parity,
+          this.energyToleranceOverride
         );
         energies.push( refinedEnergy );
 
@@ -296,7 +315,11 @@ export default class NumerovSolverClass {
         const normalizedPsi = this.normalizer.normalize( refinedPsi, grid.getDx() );
         wavefunctions.push( normalizedPsi );
       }
-      prevSign = currentSign;
+
+      if ( currentSign !== 0 ) {
+        prevSign = currentSign;
+        prevEnergy = E;
+      }
     }
 
     return { energies: energies, wavefunctions: wavefunctions };
@@ -304,17 +327,26 @@ export default class NumerovSolverClass {
 
   /**
    * Refine energy for symmetric potentials.
-   * Uses symmetric integration during bisection.
+   * Uses symmetric integration during bisection with adaptive tolerance.
+   *
+   * Physical motivation: Same as EnergyRefiner - use relative precision of 10^-8
+   * times the bracket width to ensure eigenvalue accuracy to ~10 significant figures.
    */
   private refineEnergySymmetric(
     E1: number,
     E2: number,
     V: number[],
     grid: XGrid,
-    parity: Parity
+    parity: Parity,
+    toleranceOverride?: number
   ): number {
     const N = grid.getLength();
-    const tolerance = 1e-25;
+
+    // Adaptive tolerance: 10^-8 × (bracket width) ensures high precision
+    // relative to the energy scale of the problem
+    const relativePrecision = 1e-8;
+    const tolerance = toleranceOverride ?? relativePrecision * Math.abs( E2 - E1 );
+
     let Elow = E1;
     let Ehigh = E2;
 

@@ -56,14 +56,45 @@ export default class NumerovIntegrator {
 
     // Initial conditions (boundary condition: ψ(x_min) = 0)
     psi[ 0 ] = 0;
-    psi[ 1 ] = dx; // Small non-zero value
+
+    // Physical motivation for initial value at second point:
+    // The wavefunction will be normalized after finding the eigenstate, so the absolute scale
+    // here is arbitrary. However, choosing a physically-motivated scale helps avoid numerical
+    // overflow/underflow during integration.
+    //
+    // For a bound state in a box of size L ≈ N·dx, dimensional analysis gives the typical
+    // wavefunction scale as ψ ~ 1/√L. We use a slightly larger initial value to ensure
+    // good numerical behavior: ψ(x₁) ~ 1/(N·√(dx·N))
+    //
+    // This gives units [1/√length] and magnitude that grows gradually from the boundary.
+
+    const L = N * dx; // Total domain size (meters)
+
+    // Base scale for unnormalized wavefunction during integration
+    const psiScale = 1 / ( N * Math.sqrt( L ) );
+
+    // Set second point based on whether we're in classically allowed or forbidden region
+    if ( k2[ 1 ] >= 0 ) {
+      // Classically allowed region: E > V(x₁)
+      // Wavefunction oscillates. Start with base scale value.
+      psi[ 1 ] = psiScale;
+    }
+    else {
+      // Classically forbidden region: E < V(x₁)
+      // Wavefunction decays exponentially as ψ ~ exp(-κx) where κ = √(2m(V-E)/ℏ²)
+      // Apply exponential suppression over the characteristic decay length
+      const kappa = Math.sqrt( Math.abs( k2[ 1 ] ) ); // Decay constant κ = √|k²| (1/m)
+      const decayLength = L / 2; // Use half the domain as characteristic scale
+      psi[ 1 ] = psiScale * Math.exp( -kappa * decayLength );
+    }
 
     // Numerov forward integration
     for ( let j = 1; j < N - 1; j++ ) {
       psi[ j + 1 ] = this.numerovStep( psi[ j ], psi[ j - 1 ], f[ j ], f[ j - 1 ], f[ j + 1 ] );
 
       // Check for divergence (not a bound state)
-      if ( Math.abs( psi[ j + 1 ] ) > 1e10 ) {
+      // Use a very high threshold to avoid premature cutoff for finite barriers
+      if ( Math.abs( psi[ j + 1 ] ) > 1e300 ) {
         // Force large value to indicate divergence
         this.fillDivergent( psi, j + 1, psi[ j + 1 ] );
         break;

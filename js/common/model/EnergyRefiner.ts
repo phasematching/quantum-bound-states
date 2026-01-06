@@ -17,20 +17,34 @@ import XGrid from './XGrid.js';
 export default class EnergyRefiner {
 
   private readonly integrator: NumerovIntegrator;
-  private readonly tolerance: number;
+  private readonly toleranceOverride?: number; // Optional user-specified tolerance
 
   /**
    * @param integrator - The Numerov integrator to use
-   * @param tolerance - Energy tolerance in Joules
+   * @param tolerance - Optional energy tolerance in Joules. If not provided, tolerance is
+   *                    calculated adaptively based on the energy bracket width.
    */
-  public constructor( integrator: NumerovIntegrator, tolerance = 1e-22 ) {
+  public constructor( integrator: NumerovIntegrator, tolerance?: number ) {
     this.integrator = integrator;
-    this.tolerance = tolerance;
+    this.toleranceOverride = tolerance;
   }
 
   /**
    * Refine energy eigenvalue using bisection method.
    * Searches for the energy where ψ(x_max) = 0 within the given bounds.
+   *
+   * Physical motivation for tolerance:
+   * The eigenvalue should be resolved to much better precision than the level spacing.
+   * Typical quantum systems have level spacing ΔE, and we want tolerance << ΔE.
+   *
+   * The initial bracket width (E2 - E1) is typically a fraction of the level spacing
+   * (from the energy scan that detected the sign change). A relative precision of
+   * 10^-8 ensures the eigenvalue is accurate to ~10 significant figures relative to
+   * the bracket width, which translates to ~10^-6 of the level spacing.
+   *
+   * For example:
+   * - Harmonic oscillator (ΔE ≈ 0.66 eV): tolerance ≈ 10^-6 eV
+   * - Infinite well (ΔE ≈ 0.07 eV): tolerance ≈ 10^-7 eV
    *
    * @param E1 - Lower energy bound (Joules)
    * @param E2 - Upper energy bound (Joules)
@@ -47,11 +61,15 @@ export default class EnergyRefiner {
     const N = grid.getLength();
     let Elow = E1;
     let Ehigh = E2;
-    let iterations = 0;
+
+    // Calculate adaptive tolerance based on energy scale of the bracket
+    // Relative precision of 10^-8 gives absolute tolerance = 10^-8 × (bracket width)
+    // This ensures eigenvalue accuracy of ~10 significant figures
+    const relativePrecision = 1e-8;
+    const tolerance = this.toleranceOverride ?? relativePrecision * Math.abs( E2 - E1 );
 
     // Bisection loop
-    while ( Ehigh - Elow > this.tolerance ) {
-      iterations++;
+    while ( Ehigh - Elow > tolerance ) {
       const Emid = this.calculateMidpoint( Elow, Ehigh );
 
       // Integrate at midpoint and boundary energies
@@ -70,7 +88,6 @@ export default class EnergyRefiner {
       }
     }
 
-    console.log( `EnergyRefiner: Converged in ${iterations} iterations (tolerance: ${this.tolerance} J, final range: ${Ehigh - Elow} J)` );
     return this.calculateMidpoint( Elow, Ehigh );
   }
 
