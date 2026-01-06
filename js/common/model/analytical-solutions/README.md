@@ -1,0 +1,119 @@
+# Analytical Solutions for Quantum Bound States
+
+This directory contains analytical solutions for quantum mechanical potentials that can be solved exactly. These solutions provide exact energy eigenvalues and wavefunctions, which can be used as:
+
+1. **Benchmarks** for validating numerical solvers
+2. **Fast alternatives** to numerical methods when exact solutions exist
+3. **Reference implementations** for understanding quantum mechanical systems
+
+## Available Solutions
+
+### Harmonic Oscillator
+
+The quantum harmonic oscillator is one of the most important exactly solvable problems in quantum mechanics.
+
+**Potential:** `V(x) = (1/2) * k * x²`
+
+**Energy Eigenvalues:** `E_n = ℏω(n + 1/2)` where `ω = √(k/m)`
+
+**Wavefunctions:** `ψ_n(x) = (1/√(2^n n!)) · (mω/πℏ)^(1/4) · exp(-mωx²/(2ℏ)) · H_n(√(mω/ℏ) x)`
+
+where `H_n` are the Hermite polynomials.
+
+#### Usage Example
+
+```typescript
+import { solveHarmonicOscillator } from './analytical-solutions/HarmonicOscillatorSolution.js';
+import FundamentalConstants from './FundamentalConstants.js';
+
+const mass = FundamentalConstants.ELECTRON_MASS;
+const omega = 1e15; // rad/s
+const springConstant = mass * omega * omega;
+
+// API matches NumerovSolver: takes energy bounds instead of number of states
+const result = solveHarmonicOscillator(
+  springConstant,
+  mass,
+  { xMin: -4e-9, xMax: 4e-9, numPoints: 1001 },
+  0, // energyMin
+  20 * FundamentalConstants.EV_TO_JOULES // energyMax
+);
+
+console.log('Ground state energy:', result.energies[0]);
+console.log('Number of states found:', result.energies.length);
+console.log('Ground state wavefunction:', result.wavefunctions[0]);
+```
+
+#### Comparison with Numerov Solver
+
+The analytical solution has the same API as NumerovSolver, making it a drop-in replacement for benchmarking and validation:
+
+```typescript
+import NumerovSolverClass from './NumerovSolverClass.js';
+import { solveHarmonicOscillator, createHarmonicOscillatorPotential } from './analytical-solutions/HarmonicOscillatorSolution.js';
+import FundamentalConstants from './FundamentalConstants.js';
+
+const mass = FundamentalConstants.ELECTRON_MASS;
+const omega = 1e15;
+const k = mass * omega * omega;
+const gridConfig = { xMin: -4e-9, xMax: 4e-9, numPoints: 1001 };
+const energyMin = 0;
+const energyMax = 20 * FundamentalConstants.EV_TO_JOULES;
+
+// Analytical solution
+const analytical = solveHarmonicOscillator(k, mass, gridConfig, energyMin, energyMax);
+
+// Numerical solution
+const potential = createHarmonicOscillatorPotential(k);
+const numerovSolver = new NumerovSolverClass(mass);
+const numerical = numerovSolver.solve(potential, gridConfig, energyMin, energyMax);
+
+// Compare results
+console.log('Number of states:');
+console.log('  Analytical:', analytical.energies.length);
+console.log('  Numerical:', numerical.energies.length);
+
+console.log('\nEnergy comparison:');
+for (let i = 0; i < Math.min(analytical.energies.length, numerical.energies.length); i++) {
+  const error = Math.abs(analytical.energies[i] - numerical.energies[i]);
+  const relativeError = error / analytical.energies[i];
+  console.log(`  State ${i}: ${(relativeError * 100).toExponential(2)}% error`);
+}
+```
+
+## Implementation Details
+
+### BoundStateResult Format
+
+All analytical solutions return a `BoundStateResult` object with the following structure:
+
+```typescript
+{
+  energies: number[];        // Energy eigenvalues in Joules (sorted lowest to highest)
+  wavefunctions: number[][]; // Normalized wavefunctions (each row is one state)
+  xGridArray: number[];      // Spatial grid points in meters
+  method: string;            // 'analytical' for exact solutions
+}
+```
+
+### Mathematical Utilities
+
+The `math-utilities.ts` file provides common mathematical functions:
+
+- `factorial(n)`: Computes n!
+- `hermitePolynomial(n, x)`: Evaluates the nth Hermite polynomial at x using recurrence relations
+
+## References
+
+- Griffiths, D. J., & Schroeter, D. F. (2018). "Introduction to Quantum Mechanics" (3rd ed.). Cambridge University Press.
+- Shankar, R. (1994). "Principles of Quantum Mechanics" (2nd ed.). Springer.
+
+## Future Extensions
+
+Additional exactly solvable potentials that could be added:
+
+- Infinite square well
+- Finite square well
+- Hydrogen atom (3D Coulomb potential)
+- Morse potential
+- Pöschl-Teller potential
