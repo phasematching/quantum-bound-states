@@ -40,12 +40,13 @@ export function createInfiniteSquareWellPotential(
   return ( x: number ) => {
     // Inside well: V = 0
     // Outside well: V = very large (representing infinity)
-       if (x >= -halfWidth && x <= halfWidth) {
+       if ( x >= -halfWidth && x <= halfWidth ) {
         return 0;
-      } else {
+      }
+ else {
         return barrierHeight;
-      };
-    }
+      }
+    };
   }
 
 /**
@@ -134,6 +135,6 @@ export function solveInfiniteSquareWell(
 }
 
 quantumBoundStates.register( 'InfiniteSquareWellSolution', {
-  solveInfiniteSquareWell,
-  createInfiniteSquareWellPotential
+  solveInfiniteSquareWell: solveInfiniteSquareWell,
+  createInfiniteSquareWellPotential: createInfiniteSquareWellPotential
 } );

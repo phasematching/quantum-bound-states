@@ -49,4 +49,4 @@ export function hermitePolynomial( n: number, x: number ): number {
   return H_curr;
 }
 
-quantumBoundStates.register( 'math-utilities', { factorial, hermitePolynomial } );
+quantumBoundStates.register( 'math-utilities', { factorial: factorial, hermitePolynomial: hermitePolynomial } );

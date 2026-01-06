@@ -137,4 +137,4 @@ export function solveHarmonicOscillator(
   };
 }
 
-quantumBoundStates.register( 'HarmonicOscillatorSolution', { solveHarmonicOscillator, createHarmonicOscillatorPotential } );
+quantumBoundStates.register( 'HarmonicOscillatorSolution', { solveHarmonicOscillator: solveHarmonicOscillator, createHarmonicOscillatorPotential: createHarmonicOscillatorPotential } );

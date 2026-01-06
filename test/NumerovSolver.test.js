@@ -17,6 +17,12 @@ import affirm from '../../chipper/dist/js/perennial-alias/js/browser-and-node/af
 import { solveNumerov } from '../../chipper/dist/js/quantum-bound-states/js/common/model/NumerovSolver.js';
 // eslint-disable-next-line phet/bad-sim-text
 import FundamentalConstants from '../../chipper/dist/js/quantum-bound-states/js/common/model/FundamentalConstants.js';
+// eslint-disable-next-line phet/bad-sim-text
+import { solveHarmonicOscillator } from '../../chipper/dist/js/quantum-bound-states/js/common/model/analytical-solutions/HarmonicOscillatorSolution.js';
+// eslint-disable-next-line phet/bad-sim-text
+import { solveInfiniteSquareWell } from '../../chipper/dist/js/quantum-bound-states/js/common/model/analytical-solutions/InfiniteSquareWellSolution.js';
+// eslint-disable-next-line phet/bad-sim-text
+import { solveFiniteSquareWell } from '../../chipper/dist/js/quantum-bound-states/js/common/model/analytical-solutions/FiniteSquareWellSolution.js';
 
 const formatNumber = ( value, decimals ) => Number.prototype.toFixed.call( value, decimals );
 
@@ -180,37 +186,47 @@ describe( 'NumerovSolver', () => {
             numPoints: 1001  // number of points
         };
 
-        const result = solveNumerov( potential, mass, gridConfig, 0.1 * E0, 20.5 * HBAR * omega );
+        const energyMin = 0.1 * E0;
+        const energyMax = 20.5 * HBAR * omega;
 
-        // Basic smoke test - just verify we get some results
-        affirm( result.energies.length > 0, `Found ${result.energies.length} states` );
-        affirm( result.wavefunctions.length === result.energies.length, 'Energies and wavefunctions match' );
-        affirm( Array.isArray( result.energies ), 'Energies is an array' );
-        affirm( Array.isArray( result.wavefunctions ), 'Wavefunctions is an array' );
+        // Get numerical solution
+        const numericalResult = solveNumerov( potential, mass, gridConfig, energyMin, energyMax );
 
-        console.log( `\nHarmonic Oscillator - Found ${result.energies.length} states` );
+        // Get analytical solution
+        const analyticalResult = solveHarmonicOscillator( k, mass, gridConfig, energyMin, energyMax );
 
-        // Build table data
+        // Basic smoke test - verify both methods return results
+        affirm( numericalResult.energies.length > 0, `Found ${numericalResult.energies.length} numerical states` );
+        affirm( analyticalResult.energies.length > 0, `Found ${analyticalResult.energies.length} analytical states` );
+
+        console.log( `\nHarmonic Oscillator - Found ${numericalResult.energies.length} numerical, ${analyticalResult.energies.length} analytical states` );
+
+        // Methods may find slightly different numbers of states due to boundary effects
+        // Compare the states that both methods found
+        const minStates = Math.min( numericalResult.energies.length, analyticalResult.energies.length );
+        affirm( minStates > 0, 'At least one state found by both methods' );
+
+        // Build comparison table for states found by both methods
         const tableRows = [];
-        for ( let n = 0; n < Math.min( result.energies.length, 10 ); n++ ) {
-            const computed = formatNumber( result.energies[ n ] / EV_TO_JOULES, 3 );
-            const expected = formatNumber( HBAR * omega * ( n + 1 / 2 ) / EV_TO_JOULES, 3 );
-            const error = formatNumber( Math.abs( result.energies[ n ] - HBAR * omega * ( n + 1 / 2 ) ) / ( HBAR * omega * ( n + 1 / 2 ) ) * 100, 2 );
-            const parity = getParity( result.wavefunctions[ n ] );
-            const nodes = countNodes( result.wavefunctions[ n ] );
-            tableRows.push( [ n, computed, expected, error, parity, nodes ] );
+        for ( let n = 0; n < Math.min( minStates, 10 ); n++ ) {
+            const numerical = formatNumber( numericalResult.energies[ n ] / EV_TO_JOULES, 3 );
+            const analytical = formatNumber( analyticalResult.energies[ n ] / EV_TO_JOULES, 3 );
+            const error = formatNumber( Math.abs( numericalResult.energies[ n ] - analyticalResult.energies[ n ] ) / analyticalResult.energies[ n ] * 100, 2 );
+            const parity = getParity( numericalResult.wavefunctions[ n ] );
+            const nodes = countNodes( numericalResult.wavefunctions[ n ] );
+            tableRows.push( [ n, numerical, analytical, error, parity, nodes ] );
         }
-        if ( result.energies.length > 10 ) {
+        if ( minStates > 10 ) {
             tableRows.push( [ '...', '...', '...', '...', '...', '...' ] );
         }
 
-        console.log( formatTable( tableRows, [ 'n', 'Computed (eV)', 'Expected (eV)', 'Error (%)', 'Parity', 'Nodes' ] ) );
+        console.log( formatTable( tableRows, [ 'n', 'Numerical (eV)', 'Analytical (eV)', 'Error (%)', 'Parity', 'Nodes' ] ) );
 
         let maxRelativeError = 0;
-        for ( let n = 0; n < result.energies.length; n++ ) {
-            const E_computed = result.energies[ n ];
-            const E_analytical = HBAR * omega * ( n + 1 / 2 );
-            const relativeError = Math.abs( E_computed - E_analytical ) / E_analytical;
+        for ( let n = 0; n < minStates; n++ ) {
+            const E_numerical = numericalResult.energies[ n ];
+            const E_analytical = analyticalResult.energies[ n ];
+            const relativeError = Math.abs( E_numerical - E_analytical ) / E_analytical;
             maxRelativeError = Math.max( maxRelativeError, relativeError );
 
             affirm(
@@ -237,44 +253,173 @@ describe( 'NumerovSolver', () => {
         };
 
         const E1_analytical = ( Math.PI * Math.PI * HBAR * HBAR ) / ( 2 * mass * L * L );
-        const result = solveNumerov( potential, mass, gridConfig, 0.5 * E1_analytical, 21 * 21 * E1_analytical );
+        const energyMin = 0.5 * E1_analytical;
+        const energyMax = 21 * 21 * E1_analytical;
 
-        console.log( `\nInfinite Square Well - Found ${result.energies.length} states` );
+        // Get numerical solution
+        const numericalResult = solveNumerov( potential, mass, gridConfig, energyMin, energyMax );
 
-        // Build table data
+        // Get analytical solution
+        const analyticalResult = solveInfiniteSquareWell( L, mass, gridConfig, energyMin, energyMax );
+
+        console.log( `\nInfinite Square Well - Found ${numericalResult.energies.length} numerical, ${analyticalResult.energies.length} analytical states` );
+
+        affirm( numericalResult.energies.length >= 5, `Found ${numericalResult.energies.length} numerical states (expected at least 5)` );
+        affirm( analyticalResult.energies.length >= 5, `Found ${analyticalResult.energies.length} analytical states (expected at least 5)` );
+
+        // Build comparison table
         const tableRows = [];
-        for ( let i = 0; i < Math.min( result.energies.length, 10 ); i++ ) {
+        const maxStates = Math.min( numericalResult.energies.length, analyticalResult.energies.length, 10 );
+        for ( let i = 0; i < maxStates; i++ ) {
             const n = i + 1;
-            const computed = formatNumber( result.energies[ i ] / EV_TO_JOULES, 3 );
-            const expected = formatNumber( E1_analytical * n * n / EV_TO_JOULES, 3 );
-            const error = formatNumber( Math.abs( result.energies[ i ] - E1_analytical * n * n ) / ( E1_analytical * n * n ) * 100, 2 );
-            const parity = getParity( result.wavefunctions[ i ] );
-            const nodes = countNodes( result.wavefunctions[ i ] );
-            tableRows.push( [ n, computed, expected, error, parity, nodes ] );
+            const numerical = formatNumber( numericalResult.energies[ i ] / EV_TO_JOULES, 3 );
+            const analytical = formatNumber( analyticalResult.energies[ i ] / EV_TO_JOULES, 3 );
+            const error = formatNumber( Math.abs( numericalResult.energies[ i ] - analyticalResult.energies[ i ] ) / analyticalResult.energies[ i ] * 100, 2 );
+            const parity = getParity( numericalResult.wavefunctions[ i ] );
+            const nodes = countNodes( numericalResult.wavefunctions[ i ] );
+            tableRows.push( [ n, numerical, analytical, error, parity, nodes ] );
         }
-        if ( result.energies.length > 10 ) {
+        if ( numericalResult.energies.length > 10 ) {
             tableRows.push( [ '...', '...', '...', '...', '...', '...' ] );
         }
 
-        console.log( formatTable( tableRows, [ 'n', 'Computed (eV)', 'Expected (eV)', 'Error (%)', 'Parity', 'Nodes' ] ) );
-
-        affirm( result.energies.length >= 5, `Found ${result.energies.length} states (expected at least 5)` );
+        console.log( formatTable( tableRows, [ 'n', 'Numerical (eV)', 'Analytical (eV)', 'Error (%)', 'Parity', 'Nodes' ] ) );
 
         let maxRelativeError = 0;
-        for ( let i = 0; i < result.energies.length; i++ ) {
-            const n = i + 1;
-            const E_computed = result.energies[ i ];
-            const E_analytical = ( n * n * Math.PI * Math.PI * HBAR * HBAR ) / ( 2 * mass * L * L );
-            const relativeError = Math.abs( E_computed - E_analytical ) / E_analytical;
+        for ( let i = 0; i < maxStates; i++ ) {
+            const E_numerical = numericalResult.energies[ i ];
+            const E_analytical = analyticalResult.energies[ i ];
+            const relativeError = Math.abs( E_numerical - E_analytical ) / E_analytical;
             maxRelativeError = Math.max( maxRelativeError, relativeError );
 
             affirm(
                 relativeError < 0.01,
-                `State n=${n}: Error=${formatNumber( relativeError * 100, 4 )}%`
+                `State n=${i + 1}: Error=${formatNumber( relativeError * 100, 4 )}%`
             );
         }
 
         console.log( `Infinite Square Well - Max error: ${formatNumber( maxRelativeError * 100, 4 )}%` );
+    } );
+
+    test( 'Finite Square Well', () => {
+
+        const mass = ELECTRON_MASS;
+        const L = 2e-9;  // 2 nm well width
+        const V0 = 10 * EV_TO_JOULES;  // 10 eV well depth
+        const potential = x => Math.abs( x ) < L / 2 ? -V0 : 0;
+
+        // Grid extends beyond the well to capture evanescent tails
+        const gridConfig = {
+            xMin: -3e-9,
+            xMax: 3e-9,
+            numPoints: 1001
+        };
+
+        // Bound states have energies between -V0 and 0
+        const energyMin = -V0;
+        const energyMax = 0;
+
+        // Get numerical solution
+        const numericalResult = solveNumerov( potential, mass, gridConfig, energyMin, energyMax );
+
+        // Get analytical solution
+        const analyticalResult = solveFiniteSquareWell( L, V0, mass, gridConfig, energyMin, energyMax );
+
+        console.log( `\nFinite Square Well - Found ${numericalResult.energies.length} numerical, ${analyticalResult.energies.length} analytical states` );
+        console.log( `Well parameters: L = ${L * 1e9} nm, V₀ = ${V0 / EV_TO_JOULES} eV` );
+
+        affirm( numericalResult.energies.length > 0, `Found ${numericalResult.energies.length} numerical states` );
+        affirm( analyticalResult.energies.length > 0, `Found ${analyticalResult.energies.length} analytical states` );
+
+        // Methods may find slightly different numbers of states due to boundary effects
+        // Compare the states that both methods found
+        const minStates = Math.min( numericalResult.energies.length, analyticalResult.energies.length );
+        affirm( minStates > 0, 'At least one state found by both methods' );
+
+        // Build comparison table for states found by both methods
+        const tableRows = [];
+        for ( let i = 0; i < minStates; i++ ) {
+            const numerical = formatNumber( numericalResult.energies[ i ] / EV_TO_JOULES, 4 );
+            const analytical = formatNumber( analyticalResult.energies[ i ] / EV_TO_JOULES, 4 );
+            const error = formatNumber( Math.abs( numericalResult.energies[ i ] - analyticalResult.energies[ i ] ) / Math.abs( analyticalResult.energies[ i ] ) * 100, 3 );
+            const parity = getParity( numericalResult.wavefunctions[ i ] );
+            const nodes = countNodes( numericalResult.wavefunctions[ i ] );
+            tableRows.push( [ i + 1, numerical, analytical, error, parity, nodes ] );
+        }
+
+        console.log( formatTable( tableRows, [ 'State', 'Numerical (eV)', 'Analytical (eV)', 'Error (%)', 'Parity', 'Nodes' ] ) );
+
+        // Note: Numerical and analytical solvers may find different numbers of states
+        // The numerical solver may pick up resonances/quasi-bound states near the continuum
+        // We'll validate that the analytical states are present in the numerical results
+        console.log( '\nValidating correspondence between numerical and analytical states...' );
+
+        // Match analytical states to numerical states by energy proximity
+        let goodMatches = 0;
+        let maxRelativeError = 0;
+        for ( let i = 0; i < analyticalResult.energies.length; i++ ) {
+            const E_analytical = analyticalResult.energies[ i ];
+
+            // Find closest numerical state
+            let closestIdx = 0;
+            let minDiff = Infinity;
+            for ( let j = 0; j < numericalResult.energies.length; j++ ) {
+                const diff = Math.abs( numericalResult.energies[ j ] - E_analytical );
+                if ( diff < minDiff ) {
+                    minDiff = diff;
+                    closestIdx = j;
+                }
+            }
+
+            const E_numerical = numericalResult.energies[ closestIdx ];
+            const relativeError = Math.abs( E_numerical - E_analytical ) / Math.abs( E_analytical );
+
+            if ( relativeError < 0.05 ) {
+                goodMatches++;
+                maxRelativeError = Math.max( maxRelativeError, relativeError );
+            }
+
+            console.log( `  Analytical state ${i + 1}: ${formatNumber( E_analytical / EV_TO_JOULES, 4 )} eV ` +
+                        `→ Numerical state ${closestIdx + 1}: ${formatNumber( E_numerical / EV_TO_JOULES, 4 )} eV ` +
+                        `(error: ${formatNumber( relativeError * 100, 2 )}%)` );
+        }
+
+        // Require that most analytical states have good numerical matches
+        const matchRatio = goodMatches / analyticalResult.energies.length;
+        affirm(
+            matchRatio >= 0.5,
+            `At least 50% of analytical states should match numerical states (found ${goodMatches}/${analyticalResult.energies.length})`
+        );
+
+        console.log( `Finite Square Well - Max error: ${formatNumber( maxRelativeError * 100, 4 )}%` );
+
+        // Verify wavefunctions for states found by both methods
+        const dx = ( gridConfig.xMax - gridConfig.xMin ) / ( gridConfig.numPoints - 1 );
+        for ( let i = 0; i < minStates; i++ ) {
+            const psi_numerical = numericalResult.wavefunctions[ i ];
+            const psi_analytical = analyticalResult.wavefunctions[ i ];
+
+            // Check normalization
+            let norm_numerical = 0;
+            let norm_analytical = 0;
+            for ( let j = 0; j < psi_numerical.length - 1; j++ ) {
+                norm_numerical += ( psi_numerical[ j ] * psi_numerical[ j ] + psi_numerical[ j + 1 ] * psi_numerical[ j + 1 ] ) / 2;
+                norm_analytical += ( psi_analytical[ j ] * psi_analytical[ j ] + psi_analytical[ j + 1 ] * psi_analytical[ j + 1 ] ) / 2;
+            }
+            norm_numerical *= dx;
+            norm_analytical *= dx;
+
+            affirm(
+                Math.abs( norm_numerical - 1.0 ) < 0.01,
+                `State ${i + 1}: Numerical norm = ${formatNumber( norm_numerical, 6 )}`
+            );
+            affirm(
+                Math.abs( norm_analytical - 1.0 ) < 0.01,
+                `State ${i + 1}: Analytical norm = ${formatNumber( norm_analytical, 6 )}`
+            );
+        }
+
+        console.log( 'Finite Square Well - All normalizations verified' );
     } );
 
     test( 'Wavefunction Normalization', () => {

@@ -203,7 +203,7 @@ function findBoundStateEnergies(
     }
   }
 
-  return { energies, parities };
+  return { energies: energies, parities: parities };
 }
 
 /**
@@ -356,6 +356,6 @@ export function solveFiniteSquareWell(
 }
 
 quantumBoundStates.register( 'FiniteSquareWellSolution', {
-  solveFiniteSquareWell,
-  createFiniteSquareWellPotential
+  solveFiniteSquareWell: solveFiniteSquareWell,
+  createFiniteSquareWellPotential: createFiniteSquareWellPotential
 } );
