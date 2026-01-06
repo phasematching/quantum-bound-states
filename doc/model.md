@@ -327,12 +327,13 @@ The complete solution process follows this sequence:
 
 ## Testing Strategy
 
-The model is validated against analytical solutions:
+The model is validated against analytical solutions found in `js/common/model/analytical-solutions/`:
 
-- **Harmonic Oscillator**: E_n = ℏω(n + ½) for n = 0, 1, 2, ...
-- **Infinite Square Well**: E_n = n²π²ℏ²/(2mL²) for n = 1, 2, 3, ...
+- **Harmonic Oscillator** (HarmonicOscillatorSolution.ts): E_n = ℏω(n + ½) for n = 0, 1, 2, ...
+- **Infinite Square Well** (InfiniteSquareWellSolution.ts): E_n = n²π²ℏ²/(2mL²) for n = 1, 2, 3, ...
+- **Finite Square Well** (FiniteSquareWellSolution.ts): Transcendental equations for bound states
 - **Wavefunction Normalization**: ∫|ψ|² dx = 1 for all states
 - **Node Counting**: nth excited state has n nodes
 
-Tests are in `test/NumerovSolver.test.js` using Node.js test runner.
+Tests are in `test/NumerovSolver.test.js` using Node.js test runner. Each test compares numerical results from the Numerov solver against exact analytical solutions, ensuring accuracy within acceptable tolerances (typically <0.1% for energies).
 
