@@ -22,6 +22,7 @@ const formatNumber = ( value, decimals ) => Number.prototype.toFixed.call( value
 
 /**
  * Count the number of nodes (zero crossings) in a wavefunction.
+ * Handles both regular sign changes and exact zeros (for odd wavefunctions).
  * @param {number[]} psi - Wavefunction array
  * @returns {number} - Number of nodes
  */
@@ -31,11 +32,49 @@ const countNodes = psi => {
   const skipPoints = Math.floor( N * 0.1 );
 
   let nodeCount = 0;
-  for ( let j = skipPoints + 1; j < N - skipPoints; j++ ) {
-    if ( psi[ j - 1 ] * psi[ j ] < 0 ) {
-      nodeCount++;
+
+  // Find the first non-zero value to start
+  let prevSign = 0;
+  for ( let j = skipPoints; j < N - skipPoints; j++ ) {
+    if ( psi[ j ] !== 0 ) {
+      prevSign = Math.sign( psi[ j ] );
+      break;
     }
   }
+
+  // Count sign changes, treating exact zeros as potential nodes
+  for ( let j = skipPoints + 1; j < N - skipPoints; j++ ) {
+    const currentValue = psi[ j ];
+
+    if ( currentValue !== 0 ) {
+      const currentSign = Math.sign( currentValue );
+
+      // Node occurs when sign changes
+      if ( currentSign !== prevSign && prevSign !== 0 ) {
+        nodeCount++;
+      }
+
+      prevSign = currentSign;
+    }
+    // currentValue === 0, check if this is a node by looking at neighbors
+    else {
+      // Find next non-zero value
+      let nextSign = 0;
+      for ( let k = j + 1; k < N - skipPoints; k++ ) {
+        if ( psi[ k ] !== 0 ) {
+          nextSign = Math.sign( psi[ k ] );
+          break;
+        }
+      }
+
+      // If there's a sign change across the zero, count it as a node
+      if ( nextSign !== 0 && prevSign !== 0 && nextSign !== prevSign ) {
+        nodeCount++;
+        prevSign = nextSign;
+      }
+    }
+  }
+
   return nodeCount;
 };
 
