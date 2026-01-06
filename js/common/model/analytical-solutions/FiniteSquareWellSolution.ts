@@ -166,40 +166,68 @@ function findBoundStateEnergies(
   const energies: number[] = [];
   const parities: Parity[] = [];
 
-  // Search for solutions by scanning intervals [n*π/2, (n+1)*π/2]
-  // Alternate between even and odd states
-  const numIntervals = Math.ceil( 2 * z0 / Math.PI ) + 2;
+  // Maximum number of bound states (approximate)
+  const maxStates = Math.floor( z0 / ( Math.PI / 2 ) ) + 1;
 
-  for ( let n = 0; n < numIntervals; n++ ) {
-    const xiLeft = n * Math.PI / 2 + 0.001; // Small offset to avoid singularities
-    const xiRight = ( n + 1 ) * Math.PI / 2 - 0.001;
+  // Search for states systematically, alternating even/odd by state index
+  let evenCount = 0;
+  let oddCount = 0;
 
-    // Skip if outside the allowed range
-    if ( xiLeft >= z0 ) {
-      break;
+  for ( let stateIndex = 0; stateIndex < maxStates; stateIndex++ ) {
+    let xi: number | null = null;
+    let parity: Parity;
+
+    // Alternate between even (stateIndex=0,2,4,...) and odd (stateIndex=1,3,5,...)
+    if ( stateIndex % 2 === 0 ) {
+      // Even parity state: search in interval [evenCount*π, (evenCount+1/2)*π]
+      const xiMin = evenCount * Math.PI + 0.001;
+      const xiMax = Math.min( evenCount * Math.PI + Math.PI / 2 - 0.001, z0 - 0.001 );
+
+      if ( xiMin < xiMax && xiMin < z0 ) {
+        const equation = ( xiVal: number ) => evenParityEquation( xiVal, z0 );
+        xi = findRootBisection( equation, xiMin, xiMax, 1e-10 );
+
+        // Validate the root (allow slightly larger tolerance for validation)
+        if ( xi !== null && Math.abs( equation( xi ) ) > 1e-6 ) {
+          xi = null;
+        }
+      }
+
+      parity = 'even';
+      evenCount++;
+    }
+    else {
+      // Odd parity state: search in interval [(oddCount+1/2)*π, (oddCount+1)*π]
+      const xiMin = oddCount * Math.PI + Math.PI / 2 + 0.001;
+      const xiMax = Math.min( ( oddCount + 1 ) * Math.PI - 0.001, z0 - 0.001 );
+
+      if ( xiMin < xiMax && xiMin < z0 ) {
+        const equation = ( xiVal: number ) => oddParityEquation( xiVal, z0 );
+        xi = findRootBisection( equation, xiMin, xiMax, 1e-10 );
+
+        // Validate the root (allow slightly larger tolerance for validation)
+        if ( xi !== null && Math.abs( equation( xi ) ) > 1e-6 ) {
+          xi = null;
+        }
+      }
+
+      parity = 'odd';
+      oddCount++;
     }
 
-    const xiRightClamped = Math.min( xiRight, z0 - 0.001 );
+    // Skip if state could not be found
+    if ( xi === null ) {
+      continue;
+    }
 
-    // Determine parity based on interval
-    const parity: Parity = ( n % 2 === 0 ) ? 'even' : 'odd';
-    const equation = parity === 'even' ?
-      ( xi: number ) => evenParityEquation( xi, z0 ) :
-      ( xi: number ) => oddParityEquation( xi, z0 );
+    // Convert ξ back to energy: ξ = (L/2)√(2m(E+V₀)/ℏ²)
+    // E = ξ²ℏ²/(2m(L/2)²) - V₀
+    const energy = ( xi * xi * HBAR * HBAR ) / ( 2 * mass * ( wellWidth / 2 ) * ( wellWidth / 2 ) ) - wellDepth;
 
-    // Find root in this interval
-    const xi = findRootBisection( equation, xiLeft, xiRightClamped );
-
-    if ( xi !== null ) {
-      // Convert ξ back to energy: ξ = (L/2)√(2m(E+V₀)/ℏ²)
-      // E = ξ²ℏ²/(m(L/2)²) - V₀
-      const energy = ( xi * xi * HBAR * HBAR ) / ( mass * ( wellWidth / 2 ) * ( wellWidth / 2 ) ) - wellDepth;
-
-      // Check if energy is within requested bounds
-      if ( energy >= actualEnergyMin && energy <= actualEnergyMax ) {
-        energies.push( energy );
-        parities.push( parity );
-      }
+    // Check if energy is within requested bounds
+    if ( energy >= actualEnergyMin && energy <= actualEnergyMax ) {
+      energies.push( energy );
+      parities.push( parity );
     }
   }
 
