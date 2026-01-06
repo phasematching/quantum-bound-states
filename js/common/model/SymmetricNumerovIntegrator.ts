@@ -129,7 +129,7 @@ export default class SymmetricNumerovIntegrator {
       // From Schrödinger equation: ψ''(x) = -k²(x)ψ(x)
       // Therefore: ψ(dx) = ψ(0)·[1 - k²·dx²/2] = ψ(0)·[1 - 6f] where f = k²·dx²/12
       psi[ centerIdx ] = psiScale;
-      psi[ centerIdx + 1 ] = psi[ centerIdx ] * ( 1 - 6 * f[ centerIdx ] );
+      psi[ centerIdx + 1 ] = psiScale * ( 1 - 6 * f[ centerIdx ] );
     }
     else {
       // Antisymmetric state: ψ(-x) = -ψ(x)
