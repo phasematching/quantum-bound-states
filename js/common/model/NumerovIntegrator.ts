@@ -13,6 +13,7 @@
  * @author Martin Veillette
  */
 
+import affirm from '../../../../perennial-alias/js/browser-and-node/affirm.js';
 import quantumBoundStates from '../../quantumBoundStates.js';
 import FundamentalConstants from './FundamentalConstants.js';
 import XGrid from './XGrid.js';
@@ -43,7 +44,7 @@ export default class NumerovIntegrator {
     const dx = grid.getDx();
 
     // Validate that V array matches grid length
-    assert && assert( V.length === N, `V.length (${V.length}) must equal grid.getLength() (${N})` );
+    affirm( V.length === N, `V.length (${V.length}) must equal grid.getLength() (${N})` );
 
     // initialization of the wavefunction array
     const psi = new Array( N ).fill( 0 );

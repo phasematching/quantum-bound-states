@@ -7,11 +7,11 @@
  * @author Martin Veillette
  */
 
-// Import globals first - this sets up PhET framework globals
+// Import globals first - this sets up PhET framework globals (needed for compiled dependencies)
 import './globals.js';
 
 import { test, describe } from 'node:test';
-import assert from 'node:assert/strict';
+import affirm from '../../chipper/dist/js/perennial-alias/js/browser-and-node/affirm.js';
 import { solveNumerov } from '../../chipper/dist/js/quantum-bound-states/js/common/model/NumerovSolver.js';
 import FundamentalConstants from '../../chipper/dist/js/quantum-bound-states/js/common/model/FundamentalConstants.js';
 
@@ -44,10 +44,10 @@ describe( 'NumerovSolver', () => {
     const result = solveNumerov( potential, mass, numStates, gridConfig, 0.1 * E0, 50.5 * HBAR * omega );
 
     // Basic smoke test - just verify we get some results
-    assert.ok( result.energies.length > 0, `Found ${result.energies.length} states` );
-    assert.ok( result.wavefunctions.length === result.energies.length, 'Energies and wavefunctions match' );
-    assert.ok( Array.isArray( result.energies ), 'Energies is an array' );
-    assert.ok( Array.isArray( result.wavefunctions ), 'Wavefunctions is an array' );
+    affirm( result.energies.length > 0, `Found ${result.energies.length} states` );
+    affirm( result.wavefunctions.length === result.energies.length, 'Energies and wavefunctions match' );
+    affirm( Array.isArray( result.energies ), 'Energies is an array' );
+    affirm( Array.isArray( result.wavefunctions ), 'Wavefunctions is an array' );
 
     console.log( `Harmonic Oscillator - Found ${result.energies.length} states` );
 
@@ -76,7 +76,7 @@ describe( 'NumerovSolver', () => {
     const result = solveNumerov( potential, mass, numStates, gridConfig, 0.5 * E1_analytical, 21 * 21 * E1_analytical );
 
     console.log( `Infinite Square Well - Found ${result.energies.length} states` );
-    assert.ok( result.energies.length >= 5, `Found ${result.energies.length} states (expected at least 5)` );
+    affirm( result.energies.length >= 5, `Found ${result.energies.length} states (expected at least 5)` );
 
     let maxRelativeError = 0;
     for ( let i = 0; i < result.energies.length; i++ ) {
@@ -86,7 +86,7 @@ describe( 'NumerovSolver', () => {
       const relativeError = Math.abs( E_computed - E_analytical ) / E_analytical;
       maxRelativeError = Math.max( maxRelativeError, relativeError );
 
-      assert.ok(
+      affirm(
         relativeError < 0.5,
         `State n=${n}: Error=${formatNumber( relativeError * 100, 4 )}%`
       );
@@ -113,7 +113,7 @@ describe( 'NumerovSolver', () => {
     const result = solveNumerov( potential, mass, 20, gridConfig, 0.1 * E0, 20.5 * HBAR * omega );
 
     // Ensure we found some states
-    assert.ok( result.wavefunctions.length > 0, `Found ${result.wavefunctions.length} states` );
+    affirm( result.wavefunctions.length > 0, `Found ${result.wavefunctions.length} states` );
 
     const dx = ( gridConfig.xMax - gridConfig.xMin ) / ( gridConfig.numPoints - 1 );
 
@@ -126,7 +126,7 @@ describe( 'NumerovSolver', () => {
       }
       norm *= dx;
 
-      assert.ok(
+      affirm(
         Math.abs( norm - 1.0 ) < 0.01,
         `State ${i}: Norm = ${formatNumber( norm, 6 )}`
       );
@@ -151,7 +151,7 @@ describe( 'NumerovSolver', () => {
     const result = solveNumerov( potential, mass, 20, gridConfig, 0.1 * E0, 20.5 * HBAR * omega );
 
     // Ensure we found some states
-    assert.ok( result.wavefunctions.length > 0, `Found ${result.wavefunctions.length} states` );
+    affirm( result.wavefunctions.length > 0, `Found ${result.wavefunctions.length} states` );
 
     console.log( `\nNode Counting - Found ${result.wavefunctions.length} states:` );
 

@@ -12,6 +12,7 @@
 
 import quantumBoundStates from '../../quantumBoundStates.js';
 import Utils from '../../../../dot/js/Utils.js';
+import affirm from '../../../../perennial-alias/js/browser-and-node/affirm.js';
 
 export default class XGrid {
 
@@ -25,8 +26,8 @@ export default class XGrid {
    * @param numPoints - Number of grid points
    */
   public constructor( xMin: number, xMax: number, numPoints: number ) {
-    assert && assert( numPoints >= 2, 'Grid must have at least 2 points' );
-    assert && assert( xMax > xMin, 'xMax must be greater than xMin' );
+    affirm( numPoints >= 2, 'Grid must have at least 2 points' );
+    affirm( xMax > xMin, 'xMax must be greater than xMin' );
 
     this.xMin = xMin;
     this.xMax = xMax;
