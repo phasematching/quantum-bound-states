@@ -21,6 +21,65 @@ import FundamentalConstants from '../../chipper/dist/js/quantum-bound-states/js/
 const formatNumber = ( value, decimals ) => Number.prototype.toFixed.call( value, decimals );
 
 /**
+ * Count the number of nodes (zero crossings) in a wavefunction.
+ * @param {number[]} psi - Wavefunction array
+ * @returns {number} - Number of nodes
+ */
+const countNodes = psi => {
+  const N = psi.length;
+  // Skip boundary regions (first and last 10% to be safe)
+  const skipPoints = Math.floor( N * 0.1 );
+
+  let nodeCount = 0;
+  for ( let j = skipPoints + 1; j < N - skipPoints; j++ ) {
+    if ( psi[ j - 1 ] * psi[ j ] < 0 ) {
+      nodeCount++;
+    }
+  }
+  return nodeCount;
+};
+
+/**
+ * Determine the parity (even/odd) of a wavefunction.
+ * @param {number[]} psi - Wavefunction array
+ * @returns {string} - 'even' or 'odd'
+ */
+const getParity = psi => {
+  const N = psi.length;
+  const centerIdx = Math.floor( N / 2 );
+
+  // Compare left and right halves to determine symmetry
+  // Check a representative sample of points (10% of half-domain)
+  const samplePoints = Math.floor( centerIdx * 0.1 );
+
+  let evenScore = 0;
+  let oddScore = 0;
+
+  for ( let i = 1; i <= samplePoints; i++ ) {
+    const leftIdx = centerIdx - i;
+    const rightIdx = centerIdx + i;
+
+    if ( leftIdx >= 0 && rightIdx < N ) {
+      const leftVal = psi[ leftIdx ];
+      const rightVal = psi[ rightIdx ];
+
+      // Score based on how well it matches even/odd symmetry
+      const evenDiff = Math.abs( leftVal - rightVal );
+      const oddDiff = Math.abs( leftVal + rightVal );
+
+      if ( evenDiff < oddDiff ) {
+        evenScore++;
+      }
+      else {
+        oddScore++;
+      }
+    }
+  }
+
+  return evenScore > oddScore ? 'even' : 'odd';
+};
+
+/**
  * Format a table for console output with aligned columns
  * @param {Array<Array<string|number>>} rows - Array of rows, where each row is an array of cell values
  * @param {Array<string>} headers - Optional column headers
@@ -99,13 +158,15 @@ describe( 'NumerovSolver', () => {
       const computed = formatNumber( result.energies[ n ] / EV_TO_JOULES, 3 );
       const expected = formatNumber( HBAR * omega * ( n + 1 / 2 ) / EV_TO_JOULES, 3 );
       const error = formatNumber( Math.abs( result.energies[ n ] - HBAR * omega * ( n + 1 / 2 ) ) / ( HBAR * omega * ( n + 1 / 2 ) ) * 100, 2 );
-      tableRows.push( [ n, computed, expected, error ] );
+      const parity = getParity( result.wavefunctions[ n ] );
+      const nodes = countNodes( result.wavefunctions[ n ] );
+      tableRows.push( [ n, computed, expected, error, parity, nodes ] );
     }
     if ( result.energies.length > 10 ) {
-      tableRows.push( [ '...', '...', '...', '...' ] );
+      tableRows.push( [ '...', '...', '...', '...', '...', '...' ] );
     }
 
-    console.log( formatTable( tableRows, [ 'n', 'Computed (eV)', 'Expected (eV)', 'Error (%)' ] ) );
+    console.log( formatTable( tableRows, [ 'n', 'Computed (eV)', 'Expected (eV)', 'Error (%)', 'Parity', 'Nodes' ] ) );
   } );
 
   test( 'Infinite Square Well', () => {
@@ -135,13 +196,15 @@ describe( 'NumerovSolver', () => {
       const computed = formatNumber( result.energies[ i ] / EV_TO_JOULES, 3 );
       const expected = formatNumber( E1_analytical * n * n / EV_TO_JOULES, 3 );
       const error = formatNumber( Math.abs( result.energies[ i ] - E1_analytical * n * n ) / ( E1_analytical * n * n ) * 100, 2 );
-      tableRows.push( [ n, computed, expected, error ] );
+      const parity = getParity( result.wavefunctions[ i ] );
+      const nodes = countNodes( result.wavefunctions[ i ] );
+      tableRows.push( [ n, computed, expected, error, parity, nodes ] );
     }
     if ( result.energies.length > 10 ) {
-      tableRows.push( [ '...', '...', '...', '...' ] );
+      tableRows.push( [ '...', '...', '...', '...', '...', '...' ] );
     }
 
-    console.log( formatTable( tableRows, [ 'n', 'Computed (eV)', 'Expected (eV)', 'Error (%)' ] ) );
+    console.log( formatTable( tableRows, [ 'n', 'Computed (eV)', 'Expected (eV)', 'Error (%)', 'Parity', 'Nodes' ] ) );
 
     affirm( result.energies.length >= 5, `Found ${result.energies.length} states (expected at least 5)` );
 
@@ -221,32 +284,6 @@ describe( 'NumerovSolver', () => {
     affirm( result.wavefunctions.length > 0, `Found ${result.wavefunctions.length} states` );
 
     console.log( `\nNode Counting - Found ${result.wavefunctions.length} states` );
-
-    /**
-     * Improved node counting algorithm:
-     * Count sign changes while filtering out rapid oscillations (likely numerical noise).
-     * A real node should be separated from other nodes by a reasonable distance.
-     */
-    function countNodes( psi ) {
-      const N = psi.length;
-
-      // Skip boundary regions (first and last 10% to be safe)
-      const skipPoints = Math.floor( N * 0.1 );
-
-      // Simple and robust: count all sign changes in the interior
-      // This is the simplest definition of a node (zero crossing)
-      // Some wavefunctions may have numerical artifacts, but the count should
-      // be correct for most states
-
-      let nodeCount = 0;
-      for ( let j = skipPoints + 1; j < N - skipPoints; j++ ) {
-        if ( psi[ j - 1 ] * psi[ j ] < 0 ) {
-          nodeCount++;
-        }
-      }
-
-      return nodeCount;
-    }
 
     // Build table data
     const tableRows = [];
