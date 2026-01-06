@@ -27,22 +27,18 @@
  */
 
 import quantumBoundStates from '../../quantumBoundStates.js';
-import FundamentalConstants from './FundamentalConstants.js';
+import NumerovBase from './NumerovBase.js';
 import XGrid from './XGrid.js';
 
 export type Parity = 'symmetric' | 'antisymmetric';
 
-export default class SymmetricNumerovIntegrator {
-
-  private readonly mass: number;
-  private readonly HBAR: number;
+export default class SymmetricNumerovIntegrator extends NumerovBase {
 
   /**
    * @param mass - Particle mass in kg
    */
   public constructor( mass: number ) {
-    this.mass = mass;
-    this.HBAR = FundamentalConstants.HBAR;
+    super( mass );
   }
 
   /**
@@ -82,21 +78,6 @@ export default class SymmetricNumerovIntegrator {
     this.applyParity( psi, centerIdx, parity );
 
     return psi;
-  }
-
-  /**
-   * Calculate k²(x) = 2m(E - V(x))/ℏ².
-   */
-  private calculateK2( E: number, V: number[] ): number[] {
-    return V.map( v => ( 2 * this.mass * ( E - v ) ) / ( this.HBAR * this.HBAR ) );
-  }
-
-  /**
-   * Calculate Numerov factors f_j = (h²/12) * k²(x_j).
-   */
-  private calculateNumerovFactors( k2: number[], dx: number ): number[] {
-    const factor = ( dx * dx ) / 12;
-    return k2.map( k => factor * k );
   }
 
   /**
@@ -152,24 +133,13 @@ export default class SymmetricNumerovIntegrator {
     const N = psi.length;
 
     for ( let j = centerIdx + 1; j < N - 1; j++ ) {
-      const numerator = ( 2 - 10 * f[ j ] ) * psi[ j ] - ( 1 + f[ j - 1 ] ) * psi[ j - 1 ];
-      const denominator = 1 + f[ j + 1 ];
-      psi[ j + 1 ] = numerator / denominator;
+      psi[ j + 1 ] = this.numerovStep( psi[ j ], psi[ j - 1 ], f[ j ], f[ j - 1 ], f[ j + 1 ] );
 
       // Stop on catastrophic numerical failure
       if ( !isFinite( psi[ j + 1 ] ) ) {
-        this.fillInfinity( psi, j + 1 );
+        this.fillDivergent( psi, j + 1 );
         break;
       }
-    }
-  }
-
-  /**
-   * Fill remaining array with large value to indicate divergence.
-   */
-  private fillInfinity( psi: number[], startIdx: number ): void {
-    for ( let k = startIdx; k < psi.length; k++ ) {
-      psi[ k ] = 1e300;
     }
   }
 

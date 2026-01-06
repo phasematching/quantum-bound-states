@@ -9,26 +9,22 @@
  * where f_j = (h²/12) k²(x_j) and k²(x) = 2m(E - V(x))/ℏ²
  *
  * See https://arxiv.org/abs/2203.15262 or similar references for details.
- *  
+ *
  * @author Martin Veillette
  */
 
 import affirm from '../../../../perennial-alias/js/browser-and-node/affirm.js';
 import quantumBoundStates from '../../quantumBoundStates.js';
-import FundamentalConstants from './FundamentalConstants.js';
+import NumerovBase from './NumerovBase.js';
 import XGrid from './XGrid.js';
 
-const HBAR = FundamentalConstants.HBAR;
-
-export default class NumerovIntegrator {
-
-  private readonly mass: number;
+export default class NumerovIntegrator extends NumerovBase {
 
   /**
    * @param mass - Particle mass in kg
    */
   public constructor( mass: number ) {
-    this.mass = mass;
+    super( mass );
   }
 
   /**
@@ -103,65 +99,6 @@ export default class NumerovIntegrator {
     }
 
     return psi;
-  }
-
-  /**
-   * Calculate k²(x) = 2m(E - V(x))/ℏ² for all grid points.
-   *
-   * @param E - Energy eigenvalue (Joules)
-   * @param V - Potential energy array (Joules)
-   * @returns Array of k² values
-   */
-  private calculateK2( E: number, V: number[] ): number[] {
-    return V.map( v => ( 2 * this.mass * ( E - v ) ) / ( HBAR * HBAR ) );
-  }
-
-  /**
-   * Calculate Numerov factors f_j = (h²/12) * k²(x_j) for all grid points.
-   *
-   * @param k2 - Array of k² values
-   * @param dx - Grid spacing (meters)
-   * @returns Array of Numerov factors
-   */
-  private calculateNumerovFactors( k2: number[], dx: number ): number[] {
-    const factor = ( dx * dx ) / 12;
-    return k2.map( k => factor * k );
-  }
-
-  /**
-   * Single Numerov integration step.
-   * ψ_(j+1) = [(2 - 10f_j)ψ_j - (1+f_(j-1))ψ_(j-1)] / (1+f_(j+1))
-   *
-   * @param psi_j - Wavefunction at current point
-   * @param psi_jMinus1 - Wavefunction at previous point
-   * @param f_j - Numerov factor at current point
-   * @param f_jMinus1 - Numerov factor at previous point
-   * @param f_jPlus1 - Numerov factor at next point
-   * @returns Wavefunction at next point
-   */
-  private numerovStep(
-    psi_j: number,
-    psi_jMinus1: number,
-    f_j: number,
-    f_jMinus1: number,
-    f_jPlus1: number
-  ): number {
-    const numerator = ( 2 - 10 * f_j ) * psi_j - ( 1 + f_jMinus1 ) * psi_jMinus1;
-    const denominator = 1 + f_jPlus1;
-    return numerator / denominator;
-  }
-
-  /**
-   * Fill array with divergent value from given index onwards.
-   *
-   * @param psi - Wavefunction array to fill
-   * @param startIndex - Index to start filling from
-   * @param value - Value to fill with
-   */
-  private fillDivergent( psi: number[], startIndex: number, value: number ): void {
-    for ( let k = startIndex; k < psi.length; k++ ) {
-      psi[ k ] = value;
-    }
   }
 }
 

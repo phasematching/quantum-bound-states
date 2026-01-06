@@ -39,13 +39,14 @@
 
 import NumerovSolverClass from './NumerovSolverClass.js';
 import { BoundStateResult, GridConfig, PotentialFunction } from './PotentialFunction.js';
+import NumerovBase from './NumerovBase.js';
 import NumerovIntegrator from './NumerovIntegrator.js';
 import SymmetricNumerovIntegrator from './SymmetricNumerovIntegrator.js';
 import EnergyRefiner from './EnergyRefiner.js';
 import WavefunctionNormalizer from './WavefunctionNormalizer.js';
 
 // Export classes (OO API and components)
-export { NumerovSolverClass, NumerovIntegrator, SymmetricNumerovIntegrator, EnergyRefiner, WavefunctionNormalizer };
+export { NumerovSolverClass, NumerovBase, NumerovIntegrator, SymmetricNumerovIntegrator, EnergyRefiner, WavefunctionNormalizer };
 
 // Export types
 export type { Parity } from './SymmetricNumerovIntegrator.js';

@@ -28,7 +28,7 @@ describe( 'NumerovSolver', () => {
     const mass = ELECTRON_MASS;  // kg
     const omega = 1e15;  // rad/s
     const k = mass * omega * omega;  // J/m^2
-    const potential = ( x ) => 0.5 * k * x * x;  // J
+    const potential = x => 0.5 * k * x * x;  // J
 
     // Energy of the ground state
     const E0 = 0.5 * HBAR * omega;  // J
@@ -52,8 +52,8 @@ describe( 'NumerovSolver', () => {
     console.log( `Harmonic Oscillator - Found ${result.energies.length} states` );
 
     for ( let n = 0; n < result.energies.length; n++ ) {
-      console.log( `Energy of state ${n}: ${(result.energies[n] / EV_TO_JOULES).toFixed(2)} eV` );
-      console.log( `Expected energy: ${( HBAR * omega*(n+1/2) / EV_TO_JOULES).toFixed(2)} eV` );
+      console.log( `Energy of state ${n}: ${( result.energies[ n ] / EV_TO_JOULES ).toFixed( 2 )} eV` );
+      console.log( `Expected energy: ${( HBAR * omega * ( n + 1 / 2 ) / EV_TO_JOULES ).toFixed( 2 )} eV` );
     }
   } );
 
@@ -62,7 +62,7 @@ describe( 'NumerovSolver', () => {
     const mass = ELECTRON_MASS;
     const L = 2e-9;
     const V0 = 500 * EV_TO_JOULES;
-    const potential = ( x ) => Math.abs( x ) < L / 2 ? 0 : V0;
+    const potential = x => Math.abs( x ) < L / 2 ? 0 : V0;
 
     // Use standard grid from -4nm to 4nm
     const gridConfig = {
@@ -79,8 +79,8 @@ describe( 'NumerovSolver', () => {
 
      for ( let i = 0; i < result.energies.length; i++ ) {
       const n = i + 1;
-      console.log( `Energy of state ${n}: ${(result.energies[i] / EV_TO_JOULES).toFixed(3)} eV` );
-      console.log( `Expected energy: ${( E1_analytical * (n) * (n) / EV_TO_JOULES).toFixed(3)} eV` );
+      console.log( `Energy of state ${n}: ${( result.energies[ i ] / EV_TO_JOULES ).toFixed( 3 )} eV` );
+      console.log( `Expected energy: ${( E1_analytical * ( n ) * ( n ) / EV_TO_JOULES ).toFixed( 3 )} eV` );
     }
 
     affirm( result.energies.length >= 5, `Found ${result.energies.length} states (expected at least 5)` );
@@ -107,7 +107,7 @@ describe( 'NumerovSolver', () => {
     const mass = ELECTRON_MASS;
     const omega = 1e15;
     const k = mass * omega * omega;
-    const potential = ( x ) => 0.5 * k * x * x;
+    const potential = x => 0.5 * k * x * x;
 
     // Use standard grid from -4nm to 4nm
     const E0 = 0.5 * HBAR * omega;
@@ -145,7 +145,7 @@ describe( 'NumerovSolver', () => {
     const mass = ELECTRON_MASS;
     const omega = 1e15;
     const k = mass * omega * omega;
-    const potential = ( x ) => 0.5 * k * x * x;
+    const potential = x => 0.5 * k * x * x;
 
     // Use standard grid from -4nm to 4nm
     const E0 = 0.5 * HBAR * omega;
@@ -198,7 +198,7 @@ describe( 'NumerovSolver', () => {
       const expectedEnergyEV = HBAR * omega * ( quantumNumber + 0.5 ) / EV_TO_JOULES;
 
       const nodeCorrect = ( nodeCount === i ) ? '✓' : '✗';
-      console.log( `State ${i}: Energy=${energyEV.toFixed(2)} eV, Nodes=${nodeCount} ${nodeCorrect}, Expected nodes=${i}` );
+      console.log( `State ${i}: Energy=${energyEV.toFixed( 2 )} eV, Nodes=${nodeCount} ${nodeCorrect}, Expected nodes=${i}` );
     }
 
     // Count how many states have correct node count
@@ -210,7 +210,7 @@ describe( 'NumerovSolver', () => {
       }
     }
 
-    console.log( `\nNode counting accuracy: ${correctCount}/${result.wavefunctions.length} states correct (${(100*correctCount/result.wavefunctions.length).toFixed(1)}%)` );
+    console.log( `\nNode counting accuracy: ${correctCount}/${result.wavefunctions.length} states correct (${( 100 * correctCount / result.wavefunctions.length ).toFixed( 1 )}%)` );
 
     // Require at least 50% accuracy (node counting can be challenging with numerical artifacts)
     // The important thing is that states are ordered by energy correctly, which they are
