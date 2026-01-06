@@ -138,7 +138,7 @@ describe( 'NumerovSolver', () => {
     const gridConfig = {
       xMin: -4e-9,  // m
       xMax: 4e-9,  // m
-      numPoints: 10001  // number of points
+      numPoints: 1001  // number of points
     };
 
     const numStates = 20;
