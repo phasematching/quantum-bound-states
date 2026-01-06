@@ -115,7 +115,6 @@ export default class NumerovSolverClass {
 
         // Find bound states
         const { energies, wavefunctions } = this.findBoundStates(
-            potential,
             V,
             grid,
             energyMin,
@@ -202,7 +201,6 @@ export default class NumerovSolverClass {
      * Find bound states using standard shooting method.
      */
     private findBoundStates(
-        potential: PotentialFunction,
         V: number[],
         grid: XGrid,
         energyMin: number,
