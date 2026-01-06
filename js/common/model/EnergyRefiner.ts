@@ -74,7 +74,7 @@ export default class EnergyRefiner {
     V: number[],
     grid: XGrid
   ): number {
-    const N = grid.getLength();
+    const N = grid.getNumberOfPoints();
     let energyLow = E1;
     let energyHigh = E2;
 

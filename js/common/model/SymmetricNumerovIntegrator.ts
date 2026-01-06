@@ -57,7 +57,7 @@ export default class SymmetricNumerovIntegrator extends NumerovBase {
     grid: XGrid,
     parity: Parity
   ): number[] {
-    const N = grid.getLength();
+    const N = grid.getNumberOfPoints();
     const dx = grid.getDx();
     const psi = new Array( N ).fill( 0 );
 

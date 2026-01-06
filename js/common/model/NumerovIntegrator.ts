@@ -36,7 +36,7 @@ export default class NumerovIntegrator extends NumerovBase {
    * @returns Wavefunction array
    */
   public integrate( E: number, V: number[], grid: XGrid ): number[] {
-    const N = grid.getLength();
+    const N = grid.getNumberOfPoints();
     const dx = grid.getDx();
 
     // Validate that V array matches grid length

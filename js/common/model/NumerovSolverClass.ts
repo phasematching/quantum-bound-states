@@ -343,7 +343,7 @@ export default class NumerovSolverClass {
         parity: Parity,
         toleranceOverride?: number
     ): number {
-        const N = grid.getLength();
+        const N = grid.getNumberOfPoints();
 
         // Adaptive tolerance: 10^-8 × (bracket width) ensures high precision
         // relative to the energy scale of the problem

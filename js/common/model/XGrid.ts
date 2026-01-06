@@ -44,7 +44,7 @@ export default class XGrid {
   /**
    * Get the length (number of points) of the grid.
    */
-  public getLength(): number {
+  public getNumberOfPoints(): number {
     return this.numPoints;
   }
 
