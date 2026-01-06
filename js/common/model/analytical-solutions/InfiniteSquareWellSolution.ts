@@ -7,19 +7,15 @@
  * is confined to a region with impenetrable walls.
  *
  * POTENTIAL:
- *   V(x) = 0     for 0 < x < L
+ *   V(x) = 0     for -L/2 < x < L/2
  *   V(x) = ∞     otherwise
  *
  * ENERGY EIGENVALUES:
  *   E_n = (n² π² ℏ²) / (2mL²)    for n = 1, 2, 3, ...
  *
  * WAVEFUNCTIONS:
- *   ψ_n(x) = √(2/L) sin(nπx/L)   for 0 < x < L
- *   ψ_n(x) = 0                    otherwise
- *
- * REFERENCES:
- * - Griffiths, D. J., & Schroeter, D. F. (2018). "Introduction to Quantum Mechanics" (3rd ed.).
- *   Cambridge University Press. Section 2.2, pp. 31-39.
+ *   ψ_n(x) = √(2/L) sin(nπ(x + L/2)/L),  -L/2 ≤ x ≤ L/2
+ *   ψ_n(x) = 0,  |x| > L/2
  *
  * @author Martin Veillette
  */
@@ -30,7 +26,7 @@ import FundamentalConstants from '../FundamentalConstants.js';
 
 /**
  * Create the potential function for an infinite square well.
- * V(x) = 0 for 0 < x < L, V(x) = ∞ otherwise
+ * V(x) = 0 for -L/2 < x < L/2, V(x) = ∞ otherwise
  *
  * @param wellWidth - Width of the well L in meters
  * @param barrierHeight - Height to use for "infinite" barrier (default: 1000 eV)
@@ -40,15 +36,17 @@ export function createInfiniteSquareWellPotential(
   wellWidth: number,
   barrierHeight = 1000 * FundamentalConstants.EV_TO_JOULES
 ): PotentialFunction {
+  const halfWidth = wellWidth / 2;
   return ( x: number ) => {
     // Inside well: V = 0
     // Outside well: V = very large (representing infinity)
-    if ( x > 0 && x < wellWidth ) {
-      return 0;
+       if (x >= -halfWidth && x <= halfWidth) {
+        return 0;
+      } else {
+        return barrierHeight;
+      };
     }
-    return barrierHeight;
-  };
-}
+  }
 
 /**
  * Analytical solution for the infinite square well (particle in a box).
@@ -62,22 +60,6 @@ export function createInfiniteSquareWellPotential(
  * @param energyMin - Minimum energy to search (Joules)
  * @param energyMax - Maximum energy to search (Joules)
  * @returns Bound state results with exact energies and wavefunctions
- *
- * @example
- * // Solve for states within energy range
- * const L = 1e-9; // 1 nm well
- * const mass = FundamentalConstants.ELECTRON_MASS;
- *
- * const result = solveInfiniteSquareWell(
- *   L,
- *   mass,
- *   { xMin: -0.5e-9, xMax: 1.5e-9, numPoints: 1001 },
- *   0,
- *   50 * FundamentalConstants.EV_TO_JOULES
- * );
- *
- * console.log( 'Ground state energy:', result.energies[ 0 ] );
- * console.log( 'Number of states found:', result.energies.length );
  */
 export function solveInfiniteSquareWell(
   wellWidth: number,
@@ -119,21 +101,24 @@ export function solveInfiniteSquareWell(
     xGridArray.push( gridConfig.xMin + i * dx );
   }
 
-  // Calculate wavefunctions: ψ_n(x) = √(2/L) sin(nπx/L)
+  // Calculate wavefunctions: ψ_n(x) = √(2/L) sin(nπ(x + L/2)/L)
+  // This is the shifted sine function for a centered well [-L/2, L/2]
   const wavefunctions: number[][] = [];
   const normalization = Math.sqrt( 2 / wellWidth );
+  const halfWidth = wellWidth / 2;
 
   for ( const n of quantumNumbers ) {
     const wavefunction: number[] = [];
 
     for ( const x of xGridArray ) {
-      // Wavefunction is zero outside the well [0, L]
-      if ( x <= 0 || x >= wellWidth ) {
+      // Wavefunction is zero outside the well [-L/2, L/2]
+      if ( x <= -halfWidth || x >= halfWidth ) {
         wavefunction.push( 0 );
       }
       else {
-        // Inside the well: ψ_n(x) = √(2/L) sin(nπx/L)
-        const value = normalization * Math.sin( n * Math.PI * x / wellWidth );
+        // Inside the well: ψ_n(x) = √(2/L) sin(nπ(x + L/2)/L)
+        // This shifts the [0,L] solution to be centered at x=0
+        const value = normalization * Math.sin( n * Math.PI * ( x + halfWidth ) / wellWidth );
         wavefunction.push( value );
       }
     }

@@ -26,10 +26,6 @@
  *   - Odd: ψ(x) = B sign(x) exp(-κ|x|)
  *   where k = √(2m(E+V₀)/ℏ²) and κ = √(-2mE/ℏ²)
  *
- * REFERENCES:
- * - Griffiths, D. J., & Schroeter, D. F. (2018). "Introduction to Quantum Mechanics" (3rd ed.).
- *   Cambridge University Press. Section 2.6, pp. 68-77.
- *
  * @author Martin Veillette
  */
 
