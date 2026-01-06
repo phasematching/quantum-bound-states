@@ -14,25 +14,6 @@
  * - WavefunctionNormalizer: Normalizes wavefunctions
  * - NumerovSolverClass: Orchestrates all components
  *
- * See README.md for detailed usage examples and API documentation.
- * See NUMEROV_ARCHITECTURE.md for architecture details.
- *
- * @example
- * // Functional API (quick and simple)
- * import { solveNumerov } from './NumerovSolver.js';
- * const result = solveNumerov( potential, mass, 3, gridConfig, eMin, eMax );
- *
- * @example
- * // Object-oriented API (more control)
- * import { NumerovSolverClass } from './NumerovSolver.js';
- * const solver = new NumerovSolverClass( mass, { energyTolerance: 1e-21 } );
- * const result = solver.solve( potential, 3, gridConfig, eMin, eMax );
- *
- * @example
- * // Access individual components
- * import { NumerovIntegrator, WavefunctionNormalizer } from './NumerovSolver.js';
- * const integrator = new NumerovIntegrator( mass );
- * const normalizer = new WavefunctionNormalizer( 'simpson' );
  *
  * @author Martin Veillette
  */
@@ -45,7 +26,7 @@ import SymmetricNumerovIntegrator from './SymmetricNumerovIntegrator.js';
 import EnergyRefiner from './EnergyRefiner.js';
 import WavefunctionNormalizer from './WavefunctionNormalizer.js';
 
-// Export classes (OO API and components)
+// Export classes
 export { NumerovSolverClass, NumerovBase, NumerovIntegrator, SymmetricNumerovIntegrator, EnergyRefiner, WavefunctionNormalizer };
 
 // Export types
@@ -54,7 +35,7 @@ export type { NormalizationMethod } from './WavefunctionNormalizer.js';
 export type { EnergyRefinerOptions } from './EnergyRefiner.js';
 
 /**
- * Functional API: Solve the 1D Schrödinger equation using the Numerov method.
+ * Solve the 1D Schrödinger equation using the Numerov method.
  * This is a convenience function that creates a solver and returns the results.
  *
  * @param potential - Function V(x) that returns potential energy in Joules
