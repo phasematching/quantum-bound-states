@@ -9,7 +9,6 @@
  * Architecture:
  * This file delegates to specialized classes:
  * - NumerovIntegrator: Handles integration of Schrödinger equation
- * - SymmetricNumerovIntegrator: Handles symmetric potentials with parity
  * - EnergyRefiner: Refines energy eigenvalues using bisection
  * - WavefunctionNormalizer: Normalizes wavefunctions
  * - NumerovSolverClass: Orchestrates all components
@@ -20,17 +19,14 @@
 
 import NumerovSolverClass from './NumerovSolverClass.js';
 import { BoundStateResult, GridConfig, PotentialFunction } from './PotentialFunction.js';
-import NumerovBase from './NumerovBase.js';
 import NumerovIntegrator from './NumerovIntegrator.js';
-import SymmetricNumerovIntegrator from './SymmetricNumerovIntegrator.js';
 import EnergyRefiner from './EnergyRefiner.js';
 import WavefunctionNormalizer from './WavefunctionNormalizer.js';
 
 // Export classes
-export { NumerovSolverClass, NumerovBase, NumerovIntegrator, SymmetricNumerovIntegrator, EnergyRefiner, WavefunctionNormalizer };
+export { NumerovSolverClass, NumerovIntegrator, EnergyRefiner, WavefunctionNormalizer };
 
 // Export types
-export type { Parity } from './SymmetricNumerovIntegrator.js';
 export type { NormalizationMethod } from './WavefunctionNormalizer.js';
 export type { EnergyRefinerOptions } from './EnergyRefiner.js';
 

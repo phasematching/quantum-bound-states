@@ -20,9 +20,7 @@ The implementation follows a modular, component-based architecture where special
 User API
    └── NumerovSolver.ts (exports solveNumerov function)
          └── NumerovSolverClass (orchestrator)
-               ├── NumerovBase (shared math)
-               │     ├── NumerovIntegrator (asymmetric integration)
-               │     └── SymmetricNumerovIntegrator (symmetric integration)
+               ├── NumerovIntegrator (integration)
                ├── EnergyRefiner (eigenvalue refinement)
                └── WavefunctionNormalizer (probability normalization)
 
@@ -109,34 +107,26 @@ This is the top-level module that exports the `solveNumerov()` function and all 
 **Responsibility**: Coordinates the solving process using the shooting method
 
 This class implements the shooting method algorithm:
-1. Scans an energy range with a coarse step size
+1. Scans an energy range with a coarse step size (200 steps by default)
 2. Detects eigenvalues by finding sign changes in ψ(x_max)
 3. Refines each eigenvalue using bisection
 4. Normalizes the corresponding wavefunction
 
-It manages two separate implementations for finding bound states:
-- `findBoundStates()`: Standard shooting method for general potentials
-- `findBoundStatesSymmetric()`: Optimized method for symmetric potentials using parity
-
 ---
 
-### NumerovBase.ts
-**Purpose**: Base class for integrators
-**Responsibility**: Contains shared mathematical methods
+### NumerovIntegrator.ts
+**Purpose**: Numerov integrator
+**Responsibility**: Integrates the Schrödinger equation for arbitrary potentials
 
-This abstract base class eliminates code duplication by providing common functionality:
+This class implements forward integration from the left boundary to the right boundary. It contains the core mathematical methods:
+
+**Mathematical Methods:**
 - `calculateK2()`: Computes k²(x) = 2m(E - V(x))/ℏ²
 - `calculateNumerovFactors()`: Computes f_j = (h²/12) × k²(x_j)
 - `numerovStep()`: Executes one Numerov integration step
 - `fillDivergent()`: Marks non-bound states
 
----
-
-### NumerovIntegrator.ts
-**Purpose**: General-purpose integrator
-**Responsibility**: Integrates the Schrödinger equation for arbitrary potentials
-
-This class extends NumerovBase and implements forward integration from the left boundary to the right boundary. It uses a three-step process:
+**Integration Process (three steps):**
 
 1. **Initialization** (`setInitialConditions`): Sets ψ(x_min) = 0 and intelligently chooses ψ(x₁) based on whether the region is classically allowed (oscillatory) or forbidden (exponential decay)
 
@@ -146,26 +136,7 @@ This class extends NumerovBase and implements forward integration from the left 
 
 The divergence threshold (1e300) is set very high to accommodate finite potential barriers that cause large but finite exponential growth.
 
----
-
-### SymmetricNumerovIntegrator.ts
-**Purpose**: Optimized integrator for symmetric potentials
-**Responsibility**: Exploits parity symmetry for efficiency and accuracy
-
-For symmetric potentials V(-x) = V(x), quantum mechanics guarantees all eigenstates have definite parity (even or odd). This class leverages this property:
-
-1. **Initialization** (`setInitialConditions`): Sets boundary conditions at x=0 based on parity:
-   - Symmetric (even): ψ'(0) = 0, so ψ starts with non-zero value at center
-   - Antisymmetric (odd): ψ(0) = 0, so ψ starts at zero and grows linearly
-
-2. **Half-domain integration** (`integrateFromCenter`): Integrates only from x=0 to x_max (half the work)
-
-3. **Symmetry application** (`applyParity`): Mirrors the right half to the left using parity
-
-Benefits:
-- 2× faster (half the domain)
-- More accurate (enforces symmetry exactly)
-- Better numerical stability
+**Note**: A symmetric solver implementation that exploits parity for symmetric potentials (V(-x) = V(x)) is available on the `symmetricSolver` branch. This optimized version integrates only half the domain, providing 2× speedup and improved accuracy for symmetric potentials.
 
 ---
 
