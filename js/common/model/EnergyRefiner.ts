@@ -91,6 +91,7 @@ export default class EnergyRefiner {
       const psiMid = this.integrator.integrate( energyMid, V, grid );
       const psiLow = this.integrator.integrate( energyLow, V, grid );
 
+      // Look up the wavefunction at the end of the array
       const endValueMid = this.getEndValue( psiMid, N );
       const endValueLow = this.getEndValue( psiLow, N );
 
