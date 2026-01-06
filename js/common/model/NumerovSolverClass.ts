@@ -68,14 +68,13 @@ export default class NumerovSolverClass {
 
     /**
      * Solve the 1D Schrödinger equation using the Numerov method.
-     * Main public API that finds multiple bound states.
+     * Main public API that finds all bound states within the energy bounds.
      *
      * Uses the shooting method: scans energy range looking for energies where
      * the wavefunction satisfies boundary conditions (ψ → 0 at boundaries).
      * Detects eigenvalues by finding sign changes in ψ(x_max).
      *
      * @param potential - Function V(x) that returns potential energy in Joules
-     * @param numStates - Number of bound states to find
      * @param gridConfig - Grid configuration {xMin, xMax, numPoints}
      * @param energyMin - Minimum energy to search (Joules)
      * @param energyMax - Maximum energy to search (Joules)
@@ -90,7 +89,6 @@ export default class NumerovSolverClass {
      * const solver = new NumerovSolverClass( mass );
      * const result = solver.solve(
      *   potential,
-     *   5,  // Find first 5 states
      *   { xMin: -4e-9, xMax: 4e-9, numPoints: 1001 },
      *   0,  // Ground state is above 0
      *   20 * FundamentalConstants.EV_TO_JOULES
@@ -102,7 +100,6 @@ export default class NumerovSolverClass {
      */
     public solve(
         potential: PotentialFunction,
-        numStates: number,
         gridConfig: GridConfig,
         energyMin: number,
         energyMax: number
@@ -121,7 +118,6 @@ export default class NumerovSolverClass {
             potential,
             V,
             grid,
-            numStates,
             energyMin,
             energyMax
         );
@@ -145,7 +141,6 @@ export default class NumerovSolverClass {
      * Ground state is always symmetric, first excited is antisymmetric, etc.
      *
      * @param potential - Symmetric potential function V(x) where V(-x) = V(x)
-     * @param numStates - Number of bound states to find
      * @param gridConfig - Grid configuration (should be symmetric around x=0)
      * @param energyMin - Minimum energy to search
      * @param energyMax - Maximum energy to search
@@ -156,7 +151,6 @@ export default class NumerovSolverClass {
      * // Find even states of harmonic oscillator (n=0,2,4,...)
      * const evenStates = solver.solveSymmetric(
      *   harmonicPotential,
-     *   3,  // Find 3 even states
      *   { xMin: -4e-9, xMax: 4e-9, numPoints: 1001 },
      *   0,
      *   20 * FundamentalConstants.EV_TO_JOULES,
@@ -166,7 +160,6 @@ export default class NumerovSolverClass {
      * // Find odd states (n=1,3,5,...)
      * const oddStates = solver.solveSymmetric(
      *   harmonicPotential,
-     *   3,
      *   { xMin: -4e-9, xMax: 4e-9, numPoints: 1001 },
      *   0,
      *   20 * FundamentalConstants.EV_TO_JOULES,
@@ -175,7 +168,6 @@ export default class NumerovSolverClass {
      */
     public solveSymmetric(
         potential: PotentialFunction,
-        numStates: number,
         gridConfig: GridConfig,
         energyMin: number,
         energyMax: number,
@@ -193,7 +185,6 @@ export default class NumerovSolverClass {
         const { energies, wavefunctions } = this.findBoundStatesSymmetric(
             V,
             grid,
-            numStates,
             energyMin,
             energyMax,
             parity
@@ -214,7 +205,6 @@ export default class NumerovSolverClass {
         potential: PotentialFunction,
         V: number[],
         grid: XGrid,
-        numStates: number,
         energyMin: number,
         energyMax: number
     ): { energies: number[]; wavefunctions: number[][] } {
@@ -232,7 +222,7 @@ export default class NumerovSolverClass {
 
         for (
             let E = energyMin + energyStep;
-            E <= energyMax && energies.length < numStates;
+            E <= energyMax;
             E += energyStep
         ) {
             const psi = this.integrator.integrate( E, V, grid );
@@ -272,7 +262,6 @@ export default class NumerovSolverClass {
     private findBoundStatesSymmetric(
         V: number[],
         grid: XGrid,
-        numStates: number,
         energyMin: number,
         energyMax: number,
         parity: Parity
@@ -290,7 +279,7 @@ export default class NumerovSolverClass {
 
         for (
             let E = energyMin + energyStep;
-            E <= energyMax && energies.length < numStates;
+            E <= energyMax;
             E += energyStep
         ) {
             const psi = this.symmetricIntegrator.integrateFromCenter( E, V, grid, parity );
@@ -394,7 +383,6 @@ export default class NumerovSolverClass {
  *
  * @param potential - Function V(x) that returns potential energy in Joules
  * @param mass - Particle mass in kg
- * @param numStates - Number of bound states to find
  * @param gridConfig - Grid configuration
  * @param energyMin - Minimum energy to search (Joules)
  * @param energyMax - Maximum energy to search (Joules)
@@ -403,13 +391,12 @@ export default class NumerovSolverClass {
 export function solveNumerov(
     potential: PotentialFunction,
     mass: number,
-    numStates: number,
     gridConfig: GridConfig,
     energyMin: number,
     energyMax: number
 ): BoundStateResult {
     const solver = new NumerovSolverClass( mass );
-    return solver.solve( potential, numStates, gridConfig, energyMin, energyMax );
+    return solver.solve( potential, gridConfig, energyMin, energyMax );
 }
 
 quantumBoundStates.register( 'NumerovSolver', { NumerovSolver: NumerovSolverClass, solveNumerov: solveNumerov } );

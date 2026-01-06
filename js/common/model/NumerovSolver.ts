@@ -59,7 +59,6 @@ export type { EnergyRefinerOptions } from './EnergyRefiner.js';
  *
  * @param potential - Function V(x) that returns potential energy in Joules
  * @param mass - Particle mass in kg
- * @param numStates - Number of bound states to find
  * @param gridConfig - Grid configuration
  * @param energyMin - Minimum energy to search (Joules)
  * @param energyMax - Maximum energy to search (Joules)
@@ -68,11 +67,10 @@ export type { EnergyRefinerOptions } from './EnergyRefiner.js';
 export function solveNumerov(
   potential: PotentialFunction,
   mass: number,
-  numStates: number,
   gridConfig: GridConfig,
   energyMin: number,
   energyMax: number
 ): BoundStateResult {
   const solver = new NumerovSolverClass( mass );
-  return solver.solve( potential, numStates, gridConfig, energyMin, energyMax );
+  return solver.solve( potential, gridConfig, energyMin, energyMax );
 }

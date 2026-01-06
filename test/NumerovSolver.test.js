@@ -180,8 +180,7 @@ describe( 'NumerovSolver', () => {
       numPoints: 1001  // number of points
     };
 
-    const numStates = 20;
-    const result = solveNumerov( potential, mass, numStates, gridConfig, 0.1 * E0, 20.5 * HBAR * omega );
+    const result = solveNumerov( potential, mass, gridConfig, 0.1 * E0, 20.5 * HBAR * omega );
 
     // Basic smoke test - just verify we get some results
     affirm( result.energies.length > 0, `Found ${result.energies.length} states` );
@@ -223,8 +222,7 @@ describe( 'NumerovSolver', () => {
     };
 
     const E1_analytical = ( Math.PI * Math.PI * HBAR * HBAR ) / ( 2 * mass * L * L );
-    const numStates = 20;
-    const result = solveNumerov( potential, mass, numStates, gridConfig, 0.5 * E1_analytical, 21 * 21 * E1_analytical );
+    const result = solveNumerov( potential, mass, gridConfig, 0.5 * E1_analytical, 21 * 21 * E1_analytical );
 
     console.log( `\nInfinite Square Well - Found ${result.energies.length} states` );
 
@@ -279,7 +277,7 @@ describe( 'NumerovSolver', () => {
       numPoints: 1001
     };
 
-    const result = solveNumerov( potential, mass, 20, gridConfig, 0.1 * E0, 20.5 * HBAR * omega );
+    const result = solveNumerov( potential, mass, gridConfig, 0.1 * E0, 20.5 * HBAR * omega );
 
     // Ensure we found some states
     affirm( result.wavefunctions.length > 0, `Found ${result.wavefunctions.length} states` );
@@ -317,7 +315,7 @@ describe( 'NumerovSolver', () => {
       numPoints: 1001
     };
 
-    const result = solveNumerov( potential, mass, 20, gridConfig, 0.1 * E0, 20.5 * HBAR * omega );
+    const result = solveNumerov( potential, mass, gridConfig, 0.1 * E0, 20.5 * HBAR * omega );
 
     // Ensure we found some states
     affirm( result.wavefunctions.length > 0, `Found ${result.wavefunctions.length} states` );
