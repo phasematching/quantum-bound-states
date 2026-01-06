@@ -42,16 +42,38 @@ export default class NumerovIntegrator extends NumerovBase {
     // Validate that V array matches grid length
     affirm( V.length === N, `V.length (${V.length}) must equal grid.getLength() (${N})` );
 
-    // initialization of the wavefunction array
+    // Initialize the wavefunction array
     const psi = new Array( N ).fill( 0 );
 
-    // Calculate k²(x) = 2m(E - V(x))/ℏ²
+    // Calculate k²(x) and Numerov factors
     const k2 = this.calculateK2( E, V );
-
-    // Calculate f_j = (h²/12) * k²(x_j)
     const f = this.calculateNumerovFactors( k2, dx );
 
-    // Initial conditions (boundary condition: ψ(x_min) = 0)
+    // Set initial conditions at boundary
+    this.setInitialConditions( psi, k2, dx, N );
+
+    // Integrate from left boundary to right boundary
+    this.integrateForward( psi, f );
+
+    return psi;
+  }
+
+  /**
+   * Set initial conditions at left boundary (x_min).
+   * Uses physically-motivated scales based on dimensional analysis: ψ ~ 1/√L
+   *
+   * @param psi - Wavefunction array (modified in place)
+   * @param k2 - Array of k² values
+   * @param dx - Grid spacing
+   * @param N - Number of grid points
+   */
+  private setInitialConditions(
+    psi: number[],
+    k2: number[],
+    dx: number,
+    N: number
+  ): void {
+    // Boundary condition: ψ(x_min) = 0
     psi[ 0 ] = 0;
 
     // Physical motivation for initial value at second point:
@@ -84,8 +106,17 @@ export default class NumerovIntegrator extends NumerovBase {
       const decayLength = L / 2; // Use half the domain as characteristic scale
       psi[ 1 ] = psiScale * Math.exp( -kappa * decayLength );
     }
+  }
 
-    // Numerov forward integration
+  /**
+   * Integrate forward from left boundary to right boundary.
+   *
+   * @param psi - Wavefunction array (modified in place)
+   * @param f - Numerov factors
+   */
+  private integrateForward( psi: number[], f: number[] ): void {
+    const N = psi.length;
+
     for ( let j = 1; j < N - 1; j++ ) {
       psi[ j + 1 ] = this.numerovStep( psi[ j ], psi[ j - 1 ], f[ j ], f[ j - 1 ], f[ j + 1 ] );
 
@@ -97,8 +128,6 @@ export default class NumerovIntegrator extends NumerovBase {
         break;
       }
     }
-
-    return psi;
   }
 }
 

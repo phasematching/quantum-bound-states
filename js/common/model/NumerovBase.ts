@@ -3,8 +3,7 @@
 /**
  * Base class for Numerov integrators containing shared functionality.
  * Provides common methods for calculating k², Numerov factors, and the Numerov step.
- *
- * This eliminates code duplication between NumerovIntegrator and SymmetricNumerovIntegrator.
+ * See NumerovIntegrator and SymmetricNumerovIntegrator for specific implementations.
  *
  * @author Martin Veillette
  */
