@@ -7,15 +7,57 @@
  * @author Martin Veillette
  */
 
-// Import globals first - this sets up PhET framework globals (needed for compiled dependencies)
+// Import globals first - this sets up PhET framework globals
 import './globals.js';
 
 import { test, describe } from 'node:test';
+// eslint-disable-next-line phet/bad-sim-text
 import affirm from '../../chipper/dist/js/perennial-alias/js/browser-and-node/affirm.js';
+// eslint-disable-next-line phet/bad-sim-text
 import { solveNumerov } from '../../chipper/dist/js/quantum-bound-states/js/common/model/NumerovSolver.js';
+// eslint-disable-next-line phet/bad-sim-text
 import FundamentalConstants from '../../chipper/dist/js/quantum-bound-states/js/common/model/FundamentalConstants.js';
 
 const formatNumber = ( value, decimals ) => Number.prototype.toFixed.call( value, decimals );
+
+/**
+ * Format a table for console output with aligned columns
+ * @param {Array<Array<string|number>>} rows - Array of rows, where each row is an array of cell values
+ * @param {Array<string>} headers - Optional column headers
+ * @returns {string} - Formatted table string
+ */
+const formatTable = ( rows, headers = null ) => {
+  const allRows = headers ? [ headers, ...rows ] : rows;
+
+  // Convert all cells to strings and find max width for each column
+  const stringRows = allRows.map( row => row.map( cell => String( cell ) ) );
+  const numColumns = Math.max( ...stringRows.map( row => row.length ) );
+  const columnWidths = [];
+
+  for ( let col = 0; col < numColumns; col++ ) {
+    const maxWidth = Math.max( ...stringRows.map( row => ( row[ col ] || '' ).length ) );
+    columnWidths[ col ] = maxWidth;
+  }
+
+  // Build table rows
+  const lines = [];
+
+  stringRows.forEach( ( row, rowIndex ) => {
+    const cells = row.map( ( cell, colIndex ) => {
+      const width = columnWidths[ colIndex ];
+      return cell.padEnd( width );
+    } );
+    lines.push( cells.join( '  ' ) );
+
+    // Add separator after header
+    if ( headers && rowIndex === 0 ) {
+      const separator = columnWidths.map( width => '-'.repeat( width ) ).join( '  ' );
+      lines.push( separator );
+    }
+  } );
+
+  return lines.join( '\n' );
+};
 
 const HBAR = FundamentalConstants.HBAR;
 const ELECTRON_MASS = FundamentalConstants.ELECTRON_MASS;
@@ -49,12 +91,21 @@ describe( 'NumerovSolver', () => {
     affirm( Array.isArray( result.energies ), 'Energies is an array' );
     affirm( Array.isArray( result.wavefunctions ), 'Wavefunctions is an array' );
 
-    console.log( `Harmonic Oscillator - Found ${result.energies.length} states` );
+    console.log( `\nHarmonic Oscillator - Found ${result.energies.length} states` );
 
-    for ( let n = 0; n < result.energies.length; n++ ) {
-      console.log( `Energy of state ${n}: ${( result.energies[ n ] / EV_TO_JOULES ).toFixed( 2 )} eV` );
-      console.log( `Expected energy: ${( HBAR * omega * ( n + 1 / 2 ) / EV_TO_JOULES ).toFixed( 2 )} eV` );
+    // Build table data
+    const tableRows = [];
+    for ( let n = 0; n < Math.min( result.energies.length, 10 ); n++ ) {
+      const computed = formatNumber( result.energies[ n ] / EV_TO_JOULES, 3 );
+      const expected = formatNumber( HBAR * omega * ( n + 1 / 2 ) / EV_TO_JOULES, 3 );
+      const error = formatNumber( Math.abs( result.energies[ n ] - HBAR * omega * ( n + 1 / 2 ) ) / ( HBAR * omega * ( n + 1 / 2 ) ) * 100, 2 );
+      tableRows.push( [ n, computed, expected, error ] );
     }
+    if ( result.energies.length > 10 ) {
+      tableRows.push( [ '...', '...', '...', '...' ] );
+    }
+
+    console.log( formatTable( tableRows, [ 'n', 'Computed (eV)', 'Expected (eV)', 'Error (%)' ] ) );
   } );
 
   test( 'Infinite Square Well', () => {
@@ -75,13 +126,22 @@ describe( 'NumerovSolver', () => {
     const numStates = 20;
     const result = solveNumerov( potential, mass, numStates, gridConfig, 0.5 * E1_analytical, 21 * 21 * E1_analytical );
 
-    console.log( `Infinite Square Well - Found ${result.energies.length} states` );
+    console.log( `\nInfinite Square Well - Found ${result.energies.length} states` );
 
-     for ( let i = 0; i < result.energies.length; i++ ) {
+    // Build table data
+    const tableRows = [];
+    for ( let i = 0; i < Math.min( result.energies.length, 10 ); i++ ) {
       const n = i + 1;
-      console.log( `Energy of state ${n}: ${( result.energies[ i ] / EV_TO_JOULES ).toFixed( 3 )} eV` );
-      console.log( `Expected energy: ${( E1_analytical * ( n ) * ( n ) / EV_TO_JOULES ).toFixed( 3 )} eV` );
+      const computed = formatNumber( result.energies[ i ] / EV_TO_JOULES, 3 );
+      const expected = formatNumber( E1_analytical * n * n / EV_TO_JOULES, 3 );
+      const error = formatNumber( Math.abs( result.energies[ i ] - E1_analytical * n * n ) / ( E1_analytical * n * n ) * 100, 2 );
+      tableRows.push( [ n, computed, expected, error ] );
     }
+    if ( result.energies.length > 10 ) {
+      tableRows.push( [ '...', '...', '...', '...' ] );
+    }
+
+    console.log( formatTable( tableRows, [ 'n', 'Computed (eV)', 'Expected (eV)', 'Error (%)' ] ) );
 
     affirm( result.energies.length >= 5, `Found ${result.energies.length} states (expected at least 5)` );
 
@@ -160,7 +220,7 @@ describe( 'NumerovSolver', () => {
     // Ensure we found some states
     affirm( result.wavefunctions.length > 0, `Found ${result.wavefunctions.length} states` );
 
-    console.log( `\nNode Counting - Found ${result.wavefunctions.length} states:` );
+    console.log( `\nNode Counting - Found ${result.wavefunctions.length} states` );
 
     /**
      * Improved node counting algorithm:
@@ -188,18 +248,21 @@ describe( 'NumerovSolver', () => {
       return nodeCount;
     }
 
-    for ( let i = 0; i < result.wavefunctions.length; i++ ) {
+    // Build table data
+    const tableRows = [];
+    for ( let i = 0; i < Math.min( result.wavefunctions.length, 15 ); i++ ) {
       const psi = result.wavefunctions[ i ];
-
       const nodeCount = countNodes( psi );
-
-      const energyEV = result.energies[ i ] / EV_TO_JOULES;
-      const quantumNumber = nodeCount;  // For harmonic oscillator, n = number of nodes
-      const expectedEnergyEV = HBAR * omega * ( quantumNumber + 0.5 ) / EV_TO_JOULES;
-
+      const energyEV = formatNumber( result.energies[ i ] / EV_TO_JOULES, 2 );
       const nodeCorrect = ( nodeCount === i ) ? '✓' : '✗';
-      console.log( `State ${i}: Energy=${energyEV.toFixed( 2 )} eV, Nodes=${nodeCount} ${nodeCorrect}, Expected nodes=${i}` );
+
+      tableRows.push( [ i, energyEV, nodeCount, i, nodeCorrect ] );
     }
+    if ( result.wavefunctions.length > 15 ) {
+      tableRows.push( [ '...', '...', '...', '...', '...' ] );
+    }
+
+    console.log( formatTable( tableRows, [ 'State', 'Energy (eV)', 'Nodes', 'Expected', 'Match' ] ) );
 
     // Count how many states have correct node count
     let correctCount = 0;
@@ -210,7 +273,7 @@ describe( 'NumerovSolver', () => {
       }
     }
 
-    console.log( `\nNode counting accuracy: ${correctCount}/${result.wavefunctions.length} states correct (${( 100 * correctCount / result.wavefunctions.length ).toFixed( 1 )}%)` );
+    console.log( `\nNode counting accuracy: ${correctCount}/${result.wavefunctions.length} states correct (${formatNumber( 100 * correctCount / result.wavefunctions.length, 1 )}%)` );
 
     // Require at least 50% accuracy (node counting can be challenging with numerical artifacts)
     // The important thing is that states are ordered by energy correctly, which they are
