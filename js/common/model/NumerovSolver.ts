@@ -51,6 +51,7 @@ export { NumerovSolverClass, NumerovBase, NumerovIntegrator, SymmetricNumerovInt
 // Export types
 export type { Parity } from './SymmetricNumerovIntegrator.js';
 export type { NormalizationMethod } from './WavefunctionNormalizer.js';
+export type { EnergyRefinerOptions } from './EnergyRefiner.js';
 
 /**
  * Functional API: Solve the 1D Schrödinger equation using the Numerov method.

@@ -170,12 +170,6 @@ Benefits:
 
 After the shooting method detects a sign change indicating a bound state, this class refines the energy to high precision. It uses bisection on the interval [E_low, E_high] and stops when the bracket width falls below a tolerance.
 
-The constructor accepts:
-- `tolerance`: A numerical tolerance value (default: 10^-4)
-- `isRelative`: A flag indicating if the tolerance is relative or absolute (default: true)
-
-When `isRelative` is true, the absolute tolerance is computed as `tolerance × |E_high - E_low|`, ensuring ~4 significant figures of precision relative to the problem's energy scale. When `isRelative` is false, the tolerance value is used directly as an absolute tolerance in Joules.
-
 **Key insight**: The wavefunction endpoint ψ(x_max) is a monotonic function of energy near an eigenvalue, so bisection is guaranteed to converge.
 
 **When to modify**: When changing convergence criteria, adding alternative root-finding methods, or adjusting tolerance strategies.

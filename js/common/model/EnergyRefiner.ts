@@ -20,6 +20,14 @@ import XGrid from './XGrid.js';
 // Default relative precision of 10^-4 gives absolute tolerance = 10^-4 × (bracket width)
 const DEFAULT_RELATIVE_TOLERANCE = 1e-4;
 
+/**
+ * Configuration options for EnergyRefiner.
+ */
+export type EnergyRefinerOptions = {
+  tolerance?: number;   // Tolerance value (default: 1e-4)
+  isRelative?: boolean; // If true, tolerance is relative to bracket width; if false, absolute in Joules (default: true)
+};
+
 export default class EnergyRefiner {
 
   private readonly integrator: NumerovIntegrator;
@@ -37,15 +45,17 @@ export default class EnergyRefiner {
    * the bracket width.
    *
    * @param integrator - The Numerov integrator to use
-   * @param tolerance - Energy tolerance value. If isRelative is true, this is a dimensionless
-   *                    relative tolerance. If isRelative is false, this is an absolute tolerance in Joules.
-   * @param isRelative - If true, tolerance is relative to the energy bracket width.
-   *                     If false, tolerance is an absolute value in Joules. Default is true.
+   * @param options - Configuration options
+   *   - tolerance: Energy tolerance value. If isRelative is true, this is a dimensionless
+   *                relative tolerance. If isRelative is false, this is an absolute tolerance in Joules.
+   *                Default: 1e-4
+   *   - isRelative: If true, tolerance is relative to the energy bracket width.
+   *                 If false, tolerance is an absolute value in Joules. Default: true
    */
-  public constructor( integrator: NumerovIntegrator, tolerance: number = DEFAULT_RELATIVE_TOLERANCE, isRelative = true ) {
+  public constructor( integrator: NumerovIntegrator, options?: EnergyRefinerOptions ) {
     this.integrator = integrator;
-    this.tolerance = tolerance;
-    this.isRelative = isRelative;
+    this.tolerance = options?.tolerance ?? DEFAULT_RELATIVE_TOLERANCE;
+    this.isRelative = options?.isRelative ?? true;
   }
 
   /**
