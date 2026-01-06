@@ -8,7 +8,9 @@ This directory contains analytical solutions for quantum mechanical potentials t
 
 ## Available Solutions
 
-### Harmonic Oscillator
+All analytical solutions use the same API as `NumerovSolver.solve()`, taking energy bounds (energyMin, energyMax) and returning all states within that range.
+
+### 1. Harmonic Oscillator
 
 The quantum harmonic oscillator is one of the most important exactly solvable problems in quantum mechanics.
 
@@ -108,12 +110,94 @@ The `math-utilities.ts` file provides common mathematical functions:
 - Griffiths, D. J., & Schroeter, D. F. (2018). "Introduction to Quantum Mechanics" (3rd ed.). Cambridge University Press.
 - Shankar, R. (1994). "Principles of Quantum Mechanics" (2nd ed.). Springer.
 
+### 2. Infinite Square Well
+
+The infinite square well (particle in a box) is the simplest quantum mechanical system where a particle is confined to a region with impenetrable walls.
+
+**Potential:** `V(x) = 0` for `0 < x < L`, `V(x) = ∞` otherwise
+
+**Energy Eigenvalues:** `E_n = (n² π² ℏ²) / (2mL²)` for `n = 1, 2, 3, ...`
+
+**Wavefunctions:** `ψ_n(x) = √(2/L) sin(nπx/L)` for `0 < x < L`
+
+**Physical Significance:**
+- Demonstrates quantization of energy
+- Shows zero-point energy (E₁ > 0)
+- Models quantum dots and nanowires
+
+#### Usage Example
+
+```typescript
+import { solveInfiniteSquareWell } from './analytical-solutions/InfiniteSquareWellSolution.js';
+import FundamentalConstants from './FundamentalConstants.js';
+
+const L = 1e-9; // 1 nm well
+const mass = FundamentalConstants.ELECTRON_MASS;
+
+const result = solveInfiniteSquareWell(
+  L,
+  mass,
+  { xMin: -0.5e-9, xMax: 1.5e-9, numPoints: 1001 },
+  0,
+  50 * FundamentalConstants.EV_TO_JOULES
+);
+
+console.log('Ground state energy:', result.energies[0]);
+console.log('Number of states found:', result.energies.length);
+```
+
+### 3. Finite Square Well
+
+The finite square well extends the infinite well by allowing the potential to be finite outside the well, demonstrating quantum tunneling.
+
+**Potential:** `V(x) = -V₀` for `|x| < L/2`, `V(x) = 0` for `|x| > L/2`
+
+**Energy Eigenvalues:** Found by solving transcendental equations:
+- Even parity: `tan(ξ) = η/ξ`
+- Odd parity: `-cot(ξ) = η/ξ`
+
+where `ξ = (L/2)√(2m(E+V₀)/ℏ²)` and `η = (L/2)√(-2mE/ℏ²)`
+
+**Wavefunctions:**
+- Inside (`|x| < L/2`): `A cos(kx)` (even) or `A sin(kx)` (odd)
+- Outside (`|x| > L/2`): `B exp(-κ|x|)` with appropriate symmetry
+
+where `k = √(2m(E+V₀)/ℏ²)` and `κ = √(-2mE/ℏ²)`
+
+**Physical Significance:**
+- Models quantum wells in semiconductors
+- Demonstrates quantum tunneling and evanescent waves
+- Wavefunctions penetrate into classically forbidden regions
+
+#### Usage Example
+
+```typescript
+import { solveFiniteSquareWell } from './analytical-solutions/FiniteSquareWellSolution.js';
+import FundamentalConstants from './FundamentalConstants.js';
+
+const L = 2e-9; // 2 nm well
+const V0 = 10 * FundamentalConstants.EV_TO_JOULES; // 10 eV deep
+const mass = FundamentalConstants.ELECTRON_MASS;
+
+const result = solveFiniteSquareWell(
+  L,
+  V0,
+  mass,
+  { xMin: -3e-9, xMax: 3e-9, numPoints: 1001 },
+  -V0, // energyMin (bound states are between -V₀ and 0)
+  0    // energyMax
+);
+
+console.log('Number of bound states:', result.energies.length);
+console.log('Ground state energy:', result.energies[0]);
+```
+
 ## Future Extensions
 
 Additional exactly solvable potentials that could be added:
 
-- Infinite square well
-- Finite square well
 - Hydrogen atom (3D Coulomb potential)
 - Morse potential
 - Pöschl-Teller potential
+- Delta function potential
+- Kronig-Penney model (periodic potential)
