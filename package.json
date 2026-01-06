@@ -1,6 +1,7 @@
 {
   "name": "quantum-bound-states",
   "version": "1.0.0-dev.0",
+  "type": "module",
   "license": "GPL-3.0",
   "repository": {
     "type": "git",
