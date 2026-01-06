@@ -134,7 +134,7 @@ describe( 'NumerovSolver', () => {
       norm *= dx;
 
       affirm(
-        Math.abs( norm - 1.0 ) < 0.01,
+        Math.abs( norm - 1.0 ) < 0.00001,
         `State ${i}: Norm = ${formatNumber( norm, 6 )}`
       );
     }

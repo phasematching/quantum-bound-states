@@ -78,7 +78,7 @@ export default class NumerovIntegrator {
     if ( k2[ 1 ] >= 0 ) {
       // Classically allowed region: E > V(x₁)
       // Wavefunction oscillates. Start with base scale value.
-      psi[ 1 ] = psiScale;
+      psi[ 1 ] = psiScale*Math.sin( Math.sqrt( k2[ 1 ] ) * dx );
     }
     else {
       // Classically forbidden region: E < V(x₁)
