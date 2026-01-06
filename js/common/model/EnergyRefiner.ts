@@ -42,7 +42,7 @@ export default class EnergyRefiner {
    * @param isRelative - If true, tolerance is relative to the energy bracket width.
    *                     If false, tolerance is an absolute value in Joules. Default is true.
    */
-  public constructor( integrator: NumerovIntegrator, tolerance: number = DEFAULT_RELATIVE_TOLERANCE, isRelative: boolean = true ) {
+  public constructor( integrator: NumerovIntegrator, tolerance: number = DEFAULT_RELATIVE_TOLERANCE, isRelative = true ) {
     this.integrator = integrator;
     this.tolerance = tolerance;
     this.isRelative = isRelative;
