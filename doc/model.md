@@ -216,7 +216,7 @@ Used to validate the Numerov solver for a symmetric, smooth potential.
 **Purpose**: Exact solutions for particle in a box
 **Key formulas**:
 - Energy eigenvalues: E_n = n²π²ℏ²/(2mL²) for n = 1, 2, 3, ...
-- Wavefunctions: ψ_n(x) = √(2/L) sin(nπx/L)
+- Wavefunctions: ψ_n(x) = √(2/L) sin(nπ(x-L/2)/L)
 - Hard boundary conditions (ψ = 0 at walls)
 
 Used to validate the solver for discontinuous potentials and hard boundaries.
