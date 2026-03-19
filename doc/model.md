@@ -176,9 +176,9 @@ The grid is uniform with spacing dx = (xMax - xMin) / (numPoints - 1).
 
 ### FundamentalConstants.ts
 **Purpose**: Physical constants
-**Responsibility**: Provides SI unit constants
+**Responsibility**: Provides natural unit constants (mₑ = 1, eV = 1, nm = 1)
 
-All calculations in the model use SI units internally.
+All calculations in the model use natural units: electron masses for mass, eV for energy, nm for length.
 
 ---
 

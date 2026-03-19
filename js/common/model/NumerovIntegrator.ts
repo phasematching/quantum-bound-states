@@ -26,7 +26,7 @@ export default class NumerovIntegrator {
   private readonly mass: number;
 
   /**
-   * @param mass - Particle mass in kg
+   * @param mass - Particle mass in electron masses
    */
   public constructor( mass: number ) {
     this.mass = mass;

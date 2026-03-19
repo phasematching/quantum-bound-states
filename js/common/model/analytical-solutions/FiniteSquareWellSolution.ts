@@ -42,9 +42,9 @@ type Parity = 'even' | 'odd';
  * Create the potential function for a finite square well.
  * V(x) = -V₀ for |x| < L/2, V(x) = 0 for |x| > L/2
  *
- * @param wellWidth - Width of the well L in meters
- * @param wellDepth - Depth of the well V₀ in Joules (positive value)
- * @returns Potential function V(x) in Joules
+ * @param wellWidth - Width of the well L in nm
+ * @param wellDepth - Depth of the well V₀ in eV (positive value)
+ * @returns Potential function V(x) in eV
  */
 export function createFiniteSquareWellPotential(
   wellWidth: number,
@@ -136,11 +136,11 @@ function findRootBisection(
 /**
  * Find all bound state energies for a finite square well.
  *
- * @param wellWidth - Width of the well L in meters
- * @param wellDepth - Depth of the well V₀ in Joules (positive value)
- * @param mass - Particle mass in kg
- * @param energyMin - Minimum energy to search (Joules)
- * @param energyMax - Maximum energy to search (Joules)
+ * @param wellWidth - Width of the well L in nm
+ * @param wellDepth - Depth of the well V₀ in eV (positive value)
+ * @param mass - Particle mass in electron masses
+ * @param energyMin - Minimum energy to search (eV)
+ * @param energyMax - Maximum energy to search (eV)
  * @returns Arrays of energies and parities
  */
 function findBoundStateEnergies(
@@ -237,12 +237,12 @@ function findBoundStateEnergies(
 /**
  * Calculate normalized wavefunction for a finite square well state.
  *
- * @param energy - Energy of the state in Joules
+ * @param energy - Energy of the state in eV
  * @param parity - Parity of the state (even or odd)
- * @param wellWidth - Width of the well L in meters
- * @param wellDepth - Depth of the well V₀ in Joules (positive value)
- * @param mass - Particle mass in kg
- * @param xGridArray - Array of x positions in meters
+ * @param wellWidth - Width of the well L in nm
+ * @param wellDepth - Depth of the well V₀ in eV (positive value)
+ * @param mass - Particle mass in electron masses
+ * @param xGridArray - Array of x positions in nm
  * @returns Normalized wavefunction array
  */
 function calculateWavefunction(
@@ -311,25 +311,25 @@ function calculateWavefunction(
  * This function returns a BoundStateResult compatible with NumerovSolver output.
  * The API matches NumerovSolver.solve() by taking energy bounds.
  *
- * @param wellWidth - Width of the well L in meters
- * @param wellDepth - Depth of the well V₀ in Joules (positive value)
- * @param mass - Particle mass in kg
- * @param gridConfig - Grid configuration for wavefunction evaluation
- * @param energyMin - Minimum energy to search (Joules)
- * @param energyMax - Maximum energy to search (Joules)
- * @returns Bound state results with energies and wavefunctions
+ * @param wellWidth - Width of the well L in nm
+ * @param wellDepth - Depth of the well V₀ in eV (positive value)
+ * @param mass - Particle mass in electron masses
+ * @param gridConfig - Grid configuration for wavefunction evaluation (positions in nm)
+ * @param energyMin - Minimum energy to search (eV)
+ * @param energyMax - Maximum energy to search (eV)
+ * @returns Bound state results with energies (eV) and wavefunctions
  *
  * @example
  * // Solve for states within energy range
- * const L = 2e-9; // 2 nm well
- * const V0 = 10 * FundamentalConstants.EV_TO_JOULES; // 10 eV deep
- * const mass = FundamentalConstants.ELECTRON_MASS;
+ * const L = 2; // 2 nm well
+ * const V0 = 10; // 10 eV deep
+ * const mass = 1; // electron mass
  *
  * const result = solveFiniteSquareWell(
  *   L,
  *   V0,
  *   mass,
- *   { xMin: -3e-9, xMax: 3e-9, numPoints: 1001 },
+ *   { xMin: -3, xMax: 3, numPoints: 1001 },  // ±3 nm
  *   -V0,
  *   0
  * );

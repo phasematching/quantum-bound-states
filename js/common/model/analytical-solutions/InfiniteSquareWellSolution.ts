@@ -28,13 +28,13 @@ import FundamentalConstants from '../FundamentalConstants.js';
  * Create the potential function for an infinite square well.
  * V(x) = 0 for -L/2 < x < L/2, V(x) = ∞ otherwise
  *
- * @param wellWidth - Width of the well L in meters
- * @param barrierHeight - Height to use for "infinite" barrier (default: 1000 eV)
- * @returns Potential function V(x) in Joules
+ * @param wellWidth - Width of the well L in nm
+ * @param barrierHeight - Height to use for "infinite" barrier in eV (default: 1000 eV)
+ * @returns Potential function V(x) in eV
  */
 export function createInfiniteSquareWellPotential(
   wellWidth: number,
-  barrierHeight = 1000 * FundamentalConstants.EV_TO_JOULES
+  barrierHeight = 1000
 ): PotentialFunction {
   const halfWidth = wellWidth / 2;
   return ( x: number ) => {
@@ -55,11 +55,11 @@ export function createInfiniteSquareWellPotential(
  * This function returns a BoundStateResult compatible with NumerovSolver output.
  * The API matches NumerovSolver.solve() by taking energy bounds.
  *
- * @param wellWidth - Width of the well L in meters
- * @param mass - Particle mass in kg
- * @param gridConfig - Grid configuration for wavefunction evaluation
- * @param energyMin - Minimum energy to search (Joules)
- * @param energyMax - Maximum energy to search (Joules)
+ * @param wellWidth - Width of the well L in nm
+ * @param mass - Particle mass in electron masses
+ * @param gridConfig - Grid configuration for wavefunction evaluation (positions in nm)
+ * @param energyMin - Minimum energy to search (eV)
+ * @param energyMax - Maximum energy to search (eV)
  * @returns Bound state results with exact energies and wavefunctions
  */
 export function solveInfiniteSquareWell(

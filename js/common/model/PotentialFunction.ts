@@ -9,7 +9,7 @@
 import quantumBoundStates from '../../quantumBoundStates.js';
 
 /**
- * Potential energy function V(x) that returns energy in Joules.
+ * Potential energy function V(x) that returns energy in eV, where x is in nm.
  *
  * The potential function defines the quantum system and determines
  * the allowed energy levels and wavefunctions. Common examples include:
@@ -17,23 +17,23 @@ import quantumBoundStates from '../../quantumBoundStates.js';
  * @example
  * // Harmonic oscillator: V(x) = (1/2)kx²
  * const harmonicOscillator = ( x: number ) => {
- *   const k = 1e3;  // Spring constant
+ *   const k = 1e3;  // Spring constant in eV/nm²
  *   return 0.5 * k * x * x;
  * };
  *
  * @example
  * // Infinite square well: V(x) = 0 for |x| < L/2, V₀ otherwise
  * const infiniteWell = ( x: number ) => {
- *   const L = 1e-9;  // Well width
- *   const V0 = 500 * FundamentalConstants.EV_TO_JOULES;
+ *   const L = 1;  // 1 nm well width
+ *   const V0 = 500;  // 500 eV barrier
  *   return Math.abs( x ) < L / 2 ? 0 : V0;
  * };
  *
  * @example
  * // Finite square well: V(x) = -V₀ for |x| < L/2, 0 otherwise
  * const finiteWell = ( x: number ) => {
- *   const L = 1e-9;
- *   const V0 = 10 * FundamentalConstants.EV_TO_JOULES;
+ *   const L = 1;  // 1 nm well width
+ *   const V0 = 10;  // 10 eV well depth
  *   return Math.abs( x ) < L / 2 ? -V0 : 0;
  * };
  */
@@ -49,24 +49,24 @@ export type PotentialFunction = ( x: number ) => number;
  * - Be symmetric around x=0 for symmetric potentials
  *
  * @example
- * // Grid for harmonic oscillator (±6 turning points)
+ * // Grid for harmonic oscillator (±6 nm)
  * const gridConfig: GridConfig = {
- *   xMin: -6e-9,     // -6 nm
- *   xMax: 6e-9,      // +6 nm
- *   numPoints: 1001  // ~12 pm spacing
+ *   xMin: -6,        // -6 nm
+ *   xMax: 6,         // +6 nm
+ *   numPoints: 1001  // ~0.012 nm spacing
  * };
  *
  * @example
  * // High-resolution grid for sharp features
  * const fineGrid: GridConfig = {
- *   xMin: -1e-9,
- *   xMax: 1e-9,
- *   numPoints: 2401  // ~0.8 pm spacing
+ *   xMin: -1,       // -1 nm
+ *   xMax: 1,        // +1 nm
+ *   numPoints: 2401  // ~0.0008 nm spacing
  * };
  */
 export type GridConfig = {
-  xMin: number;      // Minimum x value in meters
-  xMax: number;      // Maximum x value in meters
+  xMin: number;      // Minimum x value in nm
+  xMax: number;      // Maximum x value in nm
   numPoints: number; // Number of grid points (odd recommended for symmetric potentials)
 };
 
@@ -95,9 +95,9 @@ export type GridConfig = {
  * const probability = psi0.map( psi => psi * psi );
  */
 export type BoundStateResult = {
-  energies: number[];       // Energy eigenvalues in Joules (sorted from lowest to highest)
+  energies: number[];       // Energy eigenvalues in eV (sorted from lowest to highest)
   wavefunctions: number[][]; // Normalized wavefunctions (each row is one state)
-  xGridArray: number[];          // Spatial grid points in meters
+  xGridArray: number[];          // Spatial grid points in nm
   method: string;           // Name of the numerical method used ('numerov' or 'numerov-symmetric')
 };
 

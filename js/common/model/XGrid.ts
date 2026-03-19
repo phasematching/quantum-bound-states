@@ -21,8 +21,8 @@ export default class XGrid {
   public readonly numPoints: number;
 
   /**
-   * @param xMin - Minimum x value (meters)
-   * @param xMax - Maximum x value (meters)
+   * @param xMin - Minimum x value (nm)
+   * @param xMax - Maximum x value (nm)
    * @param numPoints - Number of grid points
    */
   public constructor( xMin: number, xMax: number, numPoints: number ) {
@@ -49,7 +49,7 @@ export default class XGrid {
   }
 
   /**
-   * Get the width (in meters) of the grid.
+   * Get the width (in nm) of the grid.
    */
     public getWidth(): number {
         return ( this.xMax - this.xMin );

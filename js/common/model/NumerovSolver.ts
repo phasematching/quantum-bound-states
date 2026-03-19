@@ -34,11 +34,11 @@ export type { EnergyRefinerOptions } from './EnergyRefiner.js';
  * Solve the 1D Schrödinger equation using the Numerov method.
  * This is a convenience function that creates a solver and returns the results.
  *
- * @param potential - Function V(x) that returns potential energy in Joules
- * @param mass - Particle mass in kg
- * @param gridConfig - Grid configuration
- * @param energyMin - Minimum energy to search (Joules)
- * @param energyMax - Maximum energy to search (Joules)
+ * @param potential - Function V(x) that returns potential energy in eV
+ * @param mass - Particle mass in electron masses
+ * @param gridConfig - Grid configuration (positions in nm)
+ * @param energyMin - Minimum energy to search (eV)
+ * @param energyMax - Maximum energy to search (eV)
  * @returns Bound state results
  */
 export function solveNumerov(

@@ -165,24 +165,23 @@ const formatTable = ( rows, headers = null ) => {
 
 const HBAR = FundamentalConstants.HBAR;
 const ELECTRON_MASS = FundamentalConstants.ELECTRON_MASS;
-const EV_TO_JOULES = FundamentalConstants.EV_TO_JOULES;
 
 describe( 'NumerovSolver', () => {
 
     test( 'Harmonic Oscillator', () => {
 
-        const mass = ELECTRON_MASS;  // kg
-        const omega = 1e15;  // rad/s
-        const k = mass * omega * omega;  // J/m^2
-        const potential = x => 0.5 * k * x * x;  // J
+        const mass = ELECTRON_MASS;  // electron masses
+        const k = 5.685630103565724;  // eV/nm² (spring constant)
+        const omega = Math.sqrt( k / mass );  // natural frequency
+        const potential = x => 0.5 * k * x * x;  // eV
 
-        // Energy of the ground state
-        const E0 = 0.5 * HBAR * omega;  // J
+        // Energy of the ground state: E0 = (1/2)ℏω
+        const E0 = 0.5 * HBAR * omega;  // eV
 
         // Use standard grid from -4nm to 4nm
         const gridConfig = {
-            xMin: -4e-9,  // m
-            xMax: 4e-9,  // m
+            xMin: -4,  // nm
+            xMax: 4,  // nm
             numPoints: 1001  // number of points
         };
 
@@ -209,8 +208,8 @@ describe( 'NumerovSolver', () => {
         // Build comparison table for states found by both methods
         const tableRows = [];
         for ( let n = 0; n < Math.min( minStates, 10 ); n++ ) {
-            const numerical = formatNumber( numericalResult.energies[ n ] / EV_TO_JOULES, 3 );
-            const analytical = formatNumber( analyticalResult.energies[ n ] / EV_TO_JOULES, 3 );
+            const numerical = formatNumber( numericalResult.energies[ n ] , 3 );
+            const analytical = formatNumber( analyticalResult.energies[ n ] , 3 );
             const error = formatNumber( Math.abs( numericalResult.energies[ n ] - analyticalResult.energies[ n ] ) / analyticalResult.energies[ n ] * 100, 2 );
             const parity = getParity( numericalResult.wavefunctions[ n ] );
             const nodes = countNodes( numericalResult.wavefunctions[ n ] );
@@ -241,8 +240,8 @@ describe( 'NumerovSolver', () => {
     test( 'Infinite Square Well', () => {
 
         const mass = ELECTRON_MASS;
-        const L = 4e-9;
-        const V0 = 50 * EV_TO_JOULES;
+        const L = 4;  // 4 nm
+        const V0 = 50;  // 50 eV barrier
         const potential = x => Math.abs( x ) < L / 2 ? 0 : V0;
 
         // Use grid that matches the infinite square well, as a result V0 is irrelevant
@@ -272,8 +271,8 @@ describe( 'NumerovSolver', () => {
         const maxStates = Math.min( numericalResult.energies.length, analyticalResult.energies.length, 10 );
         for ( let i = 0; i < maxStates; i++ ) {
             const n = i + 1;
-            const numerical = formatNumber( numericalResult.energies[ i ] / EV_TO_JOULES, 3 );
-            const analytical = formatNumber( analyticalResult.energies[ i ] / EV_TO_JOULES, 3 );
+            const numerical = formatNumber( numericalResult.energies[ i ] , 3 );
+            const analytical = formatNumber( analyticalResult.energies[ i ] , 3 );
             const error = formatNumber( Math.abs( numericalResult.energies[ i ] - analyticalResult.energies[ i ] ) / analyticalResult.energies[ i ] * 100, 2 );
             const parity = getParity( numericalResult.wavefunctions[ i ] );
             const nodes = countNodes( numericalResult.wavefunctions[ i ] );
@@ -304,14 +303,14 @@ describe( 'NumerovSolver', () => {
     test( 'Finite Square Well', () => {
 
         const mass = ELECTRON_MASS;
-        const L = 2e-9;  // 2 nm well width
-        const V0 = 10 * EV_TO_JOULES;  // 10 eV well depth
+        const L = 2;  // 2 nm well width
+        const V0 = 10;  // 10 eV well depth
         const potential = x => Math.abs( x ) < L / 2 ? -V0 : 0;
 
         // Grid extends beyond the well to capture evanescent tails
         const gridConfig = {
-            xMin: -3e-9,
-            xMax: 3e-9,
+            xMin: -3,  // nm
+            xMax: 3,   // nm
             numPoints: 1001
         };
 
@@ -326,7 +325,7 @@ describe( 'NumerovSolver', () => {
         const analyticalResult = solveFiniteSquareWell( L, V0, mass, gridConfig, energyMin, energyMax );
 
         console.log( `\nFinite Square Well - Found ${numericalResult.energies.length} numerical, ${analyticalResult.energies.length} analytical states` );
-        console.log( `Well parameters: L = ${L * 1e9} nm, V₀ = ${V0 / EV_TO_JOULES} eV` );
+        console.log( `Well parameters: L = ${L} nm, V₀ = ${V0} eV` );
 
         affirm( numericalResult.energies.length > 0, `Found ${numericalResult.energies.length} numerical states` );
         affirm( analyticalResult.energies.length > 0, `Found ${analyticalResult.energies.length} analytical states` );
@@ -339,8 +338,8 @@ describe( 'NumerovSolver', () => {
         // Build comparison table for states found by both methods
         const tableRows = [];
         for ( let i = 0; i < minStates; i++ ) {
-            const numerical = formatNumber( numericalResult.energies[ i ] / EV_TO_JOULES, 4 );
-            const analytical = formatNumber( analyticalResult.energies[ i ] / EV_TO_JOULES, 4 );
+            const numerical = formatNumber( numericalResult.energies[ i ] , 4 );
+            const analytical = formatNumber( analyticalResult.energies[ i ] , 4 );
             const error = formatNumber( Math.abs( numericalResult.energies[ i ] - analyticalResult.energies[ i ] ) / Math.abs( analyticalResult.energies[ i ] ) * 100, 3 );
             const parity = getParity( numericalResult.wavefunctions[ i ] );
             const nodes = countNodes( numericalResult.wavefunctions[ i ] );
@@ -379,8 +378,8 @@ describe( 'NumerovSolver', () => {
                 maxRelativeError = Math.max( maxRelativeError, relativeError );
             }
 
-            console.log( `  Analytical state ${i + 1}: ${formatNumber( E_analytical / EV_TO_JOULES, 4 )} eV ` +
-                        `→ Numerical state ${closestIdx + 1}: ${formatNumber( E_numerical / EV_TO_JOULES, 4 )} eV ` +
+            console.log( `  Analytical state ${i + 1}: ${formatNumber( E_analytical , 4 )} eV ` +
+                        `→ Numerical state ${closestIdx + 1}: ${formatNumber( E_numerical , 4 )} eV ` +
                         `(error: ${formatNumber( relativeError * 100, 2 )}%)` );
         }
 
@@ -425,15 +424,15 @@ describe( 'NumerovSolver', () => {
     test( 'Wavefunction Normalization', () => {
 
         const mass = ELECTRON_MASS;
-        const omega = 1e15;
-        const k = mass * omega * omega;
+        const k = 5.685630103565724;  // eV/nm²
+        const omega = Math.sqrt( k / mass );
         const potential = x => 0.5 * k * x * x;
 
         // Use standard grid from -4nm to 4nm
         const E0 = 0.5 * HBAR * omega;
         const gridConfig = {
-            xMin: -4e-9,
-            xMax: 4e-9,
+            xMin: -4,  // nm
+            xMax: 4,   // nm
             numPoints: 1001
         };
 
@@ -463,15 +462,15 @@ describe( 'NumerovSolver', () => {
     test( 'Node Counting', () => {
 
         const mass = ELECTRON_MASS;
-        const omega = 1e15;
-        const k = mass * omega * omega;
+        const k = 5.685630103565724;  // eV/nm²
+        const omega = Math.sqrt( k / mass );
         const potential = x => 0.5 * k * x * x;
 
         // Use standard grid from -4nm to 4nm
         const E0 = 0.5 * HBAR * omega;
         const gridConfig = {
-            xMin: -4e-9,
-            xMax: 4e-9,
+            xMin: -4,  // nm
+            xMax: 4,   // nm
             numPoints: 1001
         };
 
@@ -487,7 +486,7 @@ describe( 'NumerovSolver', () => {
         for ( let i = 0; i < Math.min( result.wavefunctions.length, 15 ); i++ ) {
             const psi = result.wavefunctions[ i ];
             const nodeCount = countNodes( psi );
-            const energyEV = formatNumber( result.energies[ i ] / EV_TO_JOULES, 2 );
+            const energyEV = formatNumber( result.energies[ i ] , 2 );
             const nodeCorrect = ( nodeCount === i ) ? '✓' : '✗';
 
             tableRows.push( [ i, energyEV, nodeCount, i, nodeCorrect ] );
