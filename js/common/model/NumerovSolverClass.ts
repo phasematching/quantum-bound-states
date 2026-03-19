@@ -29,7 +29,7 @@ import XGrid from './XGrid.js';
  * Configuration options for the solver.
  */
 export type NumerovSolverClassOptions = {
-    energyTolerance?: number;  // Optional tolerance for energy refinement (Joules).
+    energyTolerance?: number;  // Optional tolerance for energy refinement (eV).
                                // If not provided, uses relative tolerance × (bracket width)
     normalizationMethod?: NormalizationMethod;  // Method for normalization (default: 'trapezoidal')
     useSymmetry?: boolean;  // Whether to use symmetric integration for symmetric potentials (default: false)
@@ -49,7 +49,7 @@ export default class NumerovSolverClass {
     private readonly energyToleranceOverride?: number;
 
     /**
-     * @param mass - Particle mass in kg
+     * @param mass - Particle mass in electron masses
      * @param options - Optional solver configuration
      */
     public constructor( mass: number, options?: NumerovSolverClassOptions ) {
@@ -58,7 +58,7 @@ export default class NumerovSolverClass {
         this.symmetricIntegrator = new SymmetricNumerovIntegrator( mass );
         this.energyToleranceOverride = options?.energyTolerance;
 
-        // If energyTolerance is provided, it's absolute (in Joules); otherwise use default relative tolerance
+        // If energyTolerance is provided, it's absolute (in eV); otherwise use default relative tolerance
         const energyRefinerOptions = options?.energyTolerance !== undefined ?
             { tolerance: options.energyTolerance, isRelative: false }
             : {};
@@ -78,24 +78,25 @@ export default class NumerovSolverClass {
      * the wavefunction satisfies boundary conditions (ψ → 0 at boundaries).
      * Detects eigenvalues by finding sign changes in ψ(x_max).
      *
-     * @param potential - Function V(x) that returns potential energy in Joules
-     * @param gridConfig - Grid configuration {xMin, xMax, numPoints}
-     * @param energyMin - Minimum energy to search (Joules)
-     * @param energyMax - Maximum energy to search (Joules)
+     * @param potential - Function V(x) that returns potential energy in eV
+     * @param gridConfig - Grid configuration {xMin, xMax, numPoints} in nm
+     * @param energyMin - Minimum energy to search (eV)
+     * @param energyMax - Maximum energy to search (eV)
      * @returns Bound state results containing energies, wavefunctions, and grid
      *
      * @example
      * // Solve harmonic oscillator
-     * const omega = 1e15;  // rad/s
-     * const mass = FundamentalConstants.ELECTRON_MASS;
-     * const potential = ( x: number ) => 0.5 * mass * omega * omega * x * x;
+     * const mass = 1;  // electron masses
+     * const omega = 1e15;  // rad/s (in natural time units)
+     * const k = mass * omega * omega;
+     * const potential = ( x: number ) => 0.5 * k * x * x;
      *
      * const solver = new NumerovSolverClass( mass );
      * const result = solver.solve(
      *   potential,
-     *   { xMin: -4e-9, xMax: 4e-9, numPoints: 1001 },
+     *   { xMin: -4, xMax: 4, numPoints: 1001 },  // ±4 nm
      *   0,  // Ground state is above 0
-     *   20 * FundamentalConstants.EV_TO_JOULES
+     *   20  // 20 eV
      * );
      *
      * // Access results
@@ -154,18 +155,18 @@ export default class NumerovSolverClass {
      * // Find even states of harmonic oscillator (n=0,2,4,...)
      * const evenStates = solver.solveSymmetric(
      *   harmonicPotential,
-     *   { xMin: -4e-9, xMax: 4e-9, numPoints: 1001 },
+     *   { xMin: -4, xMax: 4, numPoints: 1001 },  // ±4 nm
      *   0,
-     *   20 * FundamentalConstants.EV_TO_JOULES,
+     *   20,  // 20 eV
      *   'symmetric'
      * );
      *
      * // Find odd states (n=1,3,5,...)
      * const oddStates = solver.solveSymmetric(
      *   harmonicPotential,
-     *   { xMin: -4e-9, xMax: 4e-9, numPoints: 1001 },
+     *   { xMin: -4, xMax: 4, numPoints: 1001 },  // ±4 nm
      *   0,
-     *   20 * FundamentalConstants.EV_TO_JOULES,
+     *   20,  // 20 eV
      *   'antisymmetric'
      * );
      */
@@ -383,11 +384,11 @@ export default class NumerovSolverClass {
  * Convenience function for solving with default settings.
  * Matches the original functional API.
  *
- * @param potential - Function V(x) that returns potential energy in Joules
- * @param mass - Particle mass in kg
- * @param gridConfig - Grid configuration
- * @param energyMin - Minimum energy to search (Joules)
- * @param energyMax - Maximum energy to search (Joules)
+ * @param potential - Function V(x) that returns potential energy in eV
+ * @param mass - Particle mass in electron masses
+ * @param gridConfig - Grid configuration (positions in nm)
+ * @param energyMin - Minimum energy to search (eV)
+ * @param energyMax - Maximum energy to search (eV)
  * @returns Bound state results
  */
 export function solveNumerov(

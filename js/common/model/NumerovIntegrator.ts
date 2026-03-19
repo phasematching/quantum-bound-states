@@ -21,7 +21,7 @@ import XGrid from './XGrid.js';
 export default class NumerovIntegrator extends NumerovBase {
 
   /**
-   * @param mass - Particle mass in kg
+   * @param mass - Particle mass in electron masses
    */
   public constructor( mass: number ) {
     super( mass );

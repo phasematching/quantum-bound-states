@@ -25,7 +25,7 @@ const DEFAULT_RELATIVE_TOLERANCE = 1e-4;
  */
 export type EnergyRefinerOptions = {
   tolerance?: number;   // Tolerance value (default: 1e-4)
-  isRelative?: boolean; // If true, tolerance is relative to bracket width; if false, absolute in Joules (default: true)
+  isRelative?: boolean; // If true, tolerance is relative to bracket width; if false, absolute in eV (default: true)
 };
 
 export default class EnergyRefiner {
@@ -47,10 +47,10 @@ export default class EnergyRefiner {
    * @param integrator - The Numerov integrator to use
    * @param options - Configuration options
    *   - tolerance: Energy tolerance value. If isRelative is true, this is a dimensionless
-   *                relative tolerance. If isRelative is false, this is an absolute tolerance in Joules.
+   *                relative tolerance. If isRelative is false, this is an absolute tolerance in eV.
    *                Default: 1e-4
    *   - isRelative: If true, tolerance is relative to the energy bracket width.
-   *                 If false, tolerance is an absolute value in Joules. Default: true
+   *                 If false, tolerance is an absolute value in eV. Default: true
    */
   public constructor( integrator: NumerovIntegrator, options?: EnergyRefinerOptions ) {
     this.integrator = integrator;

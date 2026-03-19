@@ -24,8 +24,8 @@ import { hermitePolynomial, factorial } from './math-utilities.js';
  * Create the potential function for a harmonic oscillator.
  * V(x) = (1/2) * k * x^2
  *
- * @param springConstant - Spring constant k in N/m
- * @returns Potential function V(x) in Joules
+ * @param springConstant - Spring constant k in eV/nm²
+ * @returns Potential function V(x) in eV
  */
 export function createHarmonicOscillatorPotential(
   springConstant: number
@@ -43,28 +43,28 @@ export function createHarmonicOscillatorPotential(
  * allowing analytical solutions to be used interchangeably with numerical solutions.
  * The API matches NumerovSolver.solve() by taking energy bounds.
  *
- * @param springConstant - Spring constant k in N/m
- * @param mass - Particle mass in kg
- * @param gridConfig - Grid configuration for wavefunction evaluation
- * @param energyMin - Minimum energy to search (Joules)
- * @param energyMax - Maximum energy to search (Joules)
- * @returns Bound state results with exact energies and wavefunctions
+ * @param springConstant - Spring constant k in eV/nm²
+ * @param mass - Particle mass in electron masses
+ * @param gridConfig - Grid configuration for wavefunction evaluation (positions in nm)
+ * @param energyMin - Minimum energy to search (eV)
+ * @param energyMax - Maximum energy to search (eV)
+ * @returns Bound state results with exact energies (eV) and wavefunctions
  *
  * @example
  * // Solve for states within energy range
- * const omega = 1e15; // rad/s
- * const mass = FundamentalConstants.ELECTRON_MASS;
+ * const mass = 1; // electron mass
+ * const omega = 1e15; // natural time units
  * const k = mass * omega * omega;
  *
  * const result = solveHarmonicOscillator(
  *   k,
  *   mass,
- *   { xMin: -4e-9, xMax: 4e-9, numPoints: 1001 },
+ *   { xMin: -4, xMax: 4, numPoints: 1001 },  // ±4 nm
  *   0,
- *   20 * FundamentalConstants.EV_TO_JOULES
+ *   20  // 20 eV
  * );
  *
- * console.log( 'Ground state energy:', result.energies[ 0 ] );
+ * console.log( 'Ground state energy (eV):', result.energies[ 0 ] );
  * console.log( 'Number of states found:', result.energies.length );
  */
 export function solveHarmonicOscillator(

@@ -19,7 +19,7 @@ export default abstract class NumerovBase {
   protected readonly mass: number;
 
   /**
-   * @param mass - Particle mass in kg
+   * @param mass - Particle mass in electron masses
    */
   protected constructor( mass: number ) {
     this.mass = mass;
@@ -28,9 +28,9 @@ export default abstract class NumerovBase {
   /**
    * Calculate k²(x) = 2m(E - V(x))/ℏ² for all grid points.
    *
-   * @param E - Energy eigenvalue (Joules)
-   * @param V - Potential energy array (Joules)
-   * @returns Array of k² values
+   * @param E - Energy eigenvalue (eV)
+   * @param V - Potential energy array (eV)
+   * @returns Array of k² values (nm⁻²)
    */
   protected calculateK2( E: number, V: number[] ): number[] {
     return V.map( v => ( 2 * this.mass * ( E - v ) ) / ( HBAR * HBAR ) );
@@ -39,8 +39,8 @@ export default abstract class NumerovBase {
   /**
    * Calculate Numerov factors f_j = (h²/12) * k²(x_j) for all grid points.
    *
-   * @param k2 - Array of k² values
-   * @param dx - Grid spacing (meters)
+   * @param k2 - Array of k² values (nm⁻²)
+   * @param dx - Grid spacing (nm)
    * @returns Array of Numerov factors
    */
   protected calculateNumerovFactors( k2: number[], dx: number ): number[] {

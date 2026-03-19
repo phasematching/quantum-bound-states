@@ -35,7 +35,7 @@ export type Parity = 'symmetric' | 'antisymmetric';
 export default class SymmetricNumerovIntegrator extends NumerovBase {
 
   /**
-   * @param mass - Particle mass in kg
+   * @param mass - Particle mass in electron masses
    */
   public constructor( mass: number ) {
     super( mass );
